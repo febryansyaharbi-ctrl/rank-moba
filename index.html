@@ -1,0 +1,559 @@
+<!-- ... existing code ... -->
+    <!-- Milestone Detail Modal -->
+    <div id="modal-milestone" class="modal-overlay" onclick="closeModal('modal-milestone')">
+        <div class="modal-content glass-panel p-6 rounded-2xl w-[90%] max-w-sm relative text-center border-t-2 border-yellow-500" onclick="event.stopPropagation()">
+            <button onclick="closeModal('modal-milestone')" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+            <div id="milestone-content">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ==========================================
+        // 1. FIREBASE CONFIGURATION (ISI BAGIAN INI)
+        // ==========================================
+        // Ganti konfigurasi di bawah ini dengan milik Anda dari Firebase Console TAHAP 1 saat dipublish ke GitHub.
+        let firebaseConfig = {
+            apiKey: "AIzaSyAilWL4oYoI3B2SUetb9BpjUp_n6pOquc0",
+    authDomain: "mora-republic-db.firebaseapp.com",
+    projectId: "mora-republic-db",
+    storageBucket: "mora-republic-db.firebasestorage.app",
+    messagingSenderId: "291799198754",
+    appId: "1:291799198754:web:91ce593805bab5afc2ee7b",
+    measurementId: "G-HMZPZ272D0"
+        };
+
+        // Otomatisasi fallback untuk sistem preview lokal
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mora-teams-public-v1';
+        if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // Helper untuk mempermudah path Firestore
+        const getCol = (colName) => collection(db, 'artifacts', appId, 'public', 'data', colName);
+        const getDocRef = (colName, docId) => doc(db, 'artifacts', appId, 'public', 'data', colName, docId);
+
+        // Global State & Data Models (Disinkronkan dari Firebase)
+        window.playersData = [];
+        window.guildsData = [];
+        window.rewardsData = [];
+        window.validPins = ['1234'];
+        
+        const today = new Date();
+        const currentRealMonth = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+        window.activeViewMonth = currentRealMonth;
+
+        window.siteContent = {
+            title: "MoraRepublic Rank", mapTitle: "ACHIEVEMENT MAP", mapDesc: "Reach 30 stars to unlock IMMORTAL rank.",
+            heroTitle: "THE ROAD TO IMMORTAL", heroSub: "30 STARS. ONE DESTINATION.",
+            stat1Val: "20", stat1Lbl: "PLAYERS", stat2Val: "30", stat2Lbl: "MILESTONES",
+            stat3Val: "7", stat3Lbl: "RANKS", stat4Val: "∞", stat4Lbl: "COMPETITION"
+        };
+        window.isAdmin = false;
+        window.activeTab = 'home';
+        window.activeLbTab = 'players';
+
+        const rankSystem = [
+            { id: 'master', name: 'PAYAH', min: 0, max: 5, colorClass: 'rank-master', bgClass: 'bg-master' },
+            { id: 'epic', name: 'EPIC', min: 6, max: 10, colorClass: 'rank-epic', bgClass: 'bg-epic' },
+            { id: 'legend', name: 'LEGEND', min: 11, max: 14, colorClass: 'rank-legend', bgClass: 'bg-legend' },
+            { id: 'mythic', name: 'MYTHIC', min: 15, max: 19, colorClass: 'rank-mythic', bgClass: 'bg-mythic' },
+            { id: 'honor', name: 'MYTHICAL HONOR', min: 20, max: 24, colorClass: 'rank-honor', bgClass: 'bg-honor' },
+            { id: 'glory', name: 'MYTHICAL GLORY', min: 25, max: 29, colorClass: 'rank-glory', bgClass: 'bg-glory' },
+            { id: 'immortal', name: 'IMMORTAL', min: 30, max: 999, colorClass: 'rank-immortal', bgClass: 'bg-immortal' }
+        ];
+
+        window.getPlayerStars = (player, yyyyMm) => {
+            if (!player.history || !player.history[yyyyMm]) return 0;
+            return Object.values(player.history[yyyyMm]).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
+        };
+        window.getRankInfo = (stars) => rankSystem.find(r => stars >= r.min && stars <= r.max) || rankSystem[rankSystem.length - 1];
+        window.generateId = () => Math.random().toString(36).substr(2, 9);
+        window.changeMonth = () => { window.activeViewMonth = document.getElementById('global-month').value; window.renderAll(); };
+        window.fileToBase64 = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader(); reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result); reader.onerror = e => reject(e);
+        });
+
+        window.switchTab = (tabId) => {
+            window.activeTab = tabId;
+            ['home', 'map', 'leaderboard', 'admin-dashboard'].forEach(t => {
+                document.getElementById(`sec-${t}`)?.classList.add('hidden');
+                document.getElementById(`tab-${t}`)?.classList.remove('active');
+            });
+            document.getElementById(`sec-${tabId}`)?.classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`)?.classList.add('active');
+
+            if(tabId === 'map') setTimeout(() => {
+                const mc = document.getElementById('map-container');
+                mc.scrollTo({ top: mc.scrollHeight, behavior: 'smooth' });
+            }, 100);
+            if(tabId !== 'admin-dashboard') window.renderAll();
+        };
+
+        window.setLbTab = (tab) => {
+            window.activeLbTab = tab;
+            document.getElementById('btn-lb-players').className = tab === 'players' ? 'px-6 py-2 rounded-full font-bold bg-blue-600 text-white shadow-[0_0_10px_rgba(59,130,246,0.5)] transition' : 'px-6 py-2 rounded-full font-bold bg-gray-800 text-gray-400 hover:text-white transition';
+            document.getElementById('btn-lb-guilds').className = tab === 'guilds' ? 'px-6 py-2 rounded-full font-bold bg-blue-600 text-white shadow-[0_0_10px_rgba(59,130,246,0.5)] transition' : 'px-6 py-2 rounded-full font-bold bg-gray-800 text-gray-400 hover:text-white transition';
+            window.renderLeaderboard();
+        };
+
+        window.setAdminTab = (tab) => {
+            ['players', 'players-edit', 'guilds', 'rewards', 'content', 'settings'].forEach(t => {
+                document.getElementById(`admin-pane-${t}`).classList.add('hidden');
+                document.getElementById(`admin-tab-${t}`).classList.remove('bg-blue-600', 'text-white');
+                document.getElementById(`admin-tab-${t}`).classList.add('bg-gray-800', 'text-gray-300');
+            });
+            document.getElementById(`admin-pane-${tab}`).classList.remove('hidden');
+            document.getElementById(`admin-tab-${tab}`).classList.remove('bg-gray-800', 'text-gray-300');
+            document.getElementById(`admin-tab-${tab}`).classList.add('bg-blue-600', 'text-white');
+        };
+
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        window.showMessage = (title, text) => {
+            document.getElementById('modal-message-title').innerText = title;
+            document.getElementById('modal-message-text').innerText = text;
+            document.getElementById('modal-capture-area').classList.add('hidden');
+            document.getElementById('modal-msg-ok-btn').classList.remove('hidden');
+            document.getElementById('modal-message').classList.add('active');
+        };
+
+        window.recalculateGuildStars = () => {
+            window.guildsData.forEach(g => g.totalStars = 0);
+            window.playersData.forEach(p => {
+                const s = window.getPlayerStars(p, window.activeViewMonth);
+                if(p.guild_id) {
+                    const guild = window.guildsData.find(g => g.id === p.guild_id);
+                    if(guild) guild.totalStars = (guild.totalStars || 0) + s;
+                }
+            });
+        };
+
+        window.renderAll = () => {
+            window.applySiteContent(); window.recalculateGuildStars();
+            
+            // Safe check for month inputs
+            if (document.getElementById('global-month')) document.getElementById('global-month').value = window.activeViewMonth;
+            if (document.getElementById('global-month-mobile')) document.getElementById('global-month-mobile').value = window.activeViewMonth;
+            
+            if(window.activeTab === 'map') window.renderMap();
+            if(window.activeTab === 'leaderboard') window.renderLeaderboard();
+            if(window.activeTab === 'home') window.renderHome();
+            if(window.isAdmin) window.renderAdminPanes();
+        };
+
+        window.applySiteContent = () => {
+            // Helper function agar tidak crash jika ID elemen tidak ditemukan di HTML
+            const setTxt = (id, txt) => { const el = document.getElementById(id); if(el) el.innerText = txt; };
+            
+            setTxt('nav-title', window.siteContent.title); 
+            if(window.siteContent.title) document.title = window.siteContent.title;
+            
+            setTxt('map-title', window.siteContent.mapTitle); 
+            setTxt('map-desc', window.siteContent.mapDesc);
+            setTxt('hero-title', window.siteContent.heroTitle); 
+            setTxt('hero-subtitle', window.siteContent.heroSub);
+            
+            setTxt('stat-players-val', window.siteContent.stat1Val); setTxt('stat-players-lbl', window.siteContent.stat1Lbl);
+            setTxt('stat-milestones-val', window.siteContent.stat2Val); setTxt('stat-milestones-lbl', window.siteContent.stat2Lbl);
+            setTxt('stat-ranks-val', window.siteContent.stat3Val); setTxt('stat-ranks-lbl', window.siteContent.stat3Lbl);
+            setTxt('stat-comp-val', window.siteContent.stat4Val); setTxt('stat-comp-lbl', window.siteContent.stat4Lbl);
+        };
+
+        window.renderMap = () => {
+            const mapEl = document.getElementById('map-nodes'); mapEl.innerHTML = '';
+            const offsetPattern = [0, 40, 0, -40];
+
+            for (let star = 30; star >= 0; star--) {
+                const isMax = star === 30; const rank = window.getRankInfo(star);
+                const playersHere = window.playersData.filter(p => isMax ? window.getPlayerStars(p, window.activeViewMonth) >= 30 : window.getPlayerStars(p, window.activeViewMonth) === star);
+                const rewardInfo = window.rewardsData.find(r => r.star === star);
+                
+                let displayReward = "";
+                if(rewardInfo && (rewardInfo.name || rewardInfo.name2)) {
+                    displayReward = rewardInfo.name && rewardInfo.name2 ? `${rewardInfo.name} & ${rewardInfo.name2}` : (rewardInfo.name || rewardInfo.name2);
+                }
+                
+                const isRankBoundary = (star === rank.min);
+                const isRightSide = (rankSystem.findIndex(r => r.id === rank.id) % 2 === 0);
+                const offsetX = offsetPattern[star % 4];
+
+                const nodeC = document.createElement('div'); nodeC.className = "relative w-full flex items-center justify-center";
+                const tagTextSize = playersHere.length > 4 ? 'text-[8px] px-1 py-0.5' : 'text-[10px] md:text-xs px-2 py-1';
+
+                nodeC.innerHTML = `
+                    ${isRankBoundary ? `<div class="absolute ${isRightSide ? 'right-2 md:right-8' : 'left-2 md:left-8'} top-1/2 -translate-y-1/2 z-0 pointer-events-none"><span class="${isRightSide ? 'vertical-text-right' : 'vertical-text-left'} font-gaming font-black text-5xl md:text-7xl ${rank.colorClass} opacity-40 shadow-black drop-shadow-2xl" style="text-shadow: 0 0 30px currentColor;">${rank.name}</span></div>` : ''}
+                    <div class="w-full flex flex-col items-center justify-center relative z-10 transition-transform duration-300" style="transform: translateX(${offsetX}px);">
+                        ${playersHere.length > 0 ? `<div class="flex flex-wrap justify-center gap-1 mb-1 max-w-[140px] md:max-w-[180px]">${playersHere.map(p => `<div class="bg-black/90 border border-gray-600 rounded whitespace-nowrap ${tagTextSize} font-bold cursor-pointer hover:bg-gray-800 transition shadow-lg" onclick="showPlayerProfile('${p.id}')"><span class="${rank.colorClass}">${p.name}</span></div>`).join('')}</div>` : '<div class="h-2 mb-1"></div>'}
+                        <div class="star-node flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full ${rank.bgClass} border-[3px] ${rank.colorClass} glow-box bg-[#0a0a0f] cursor-pointer shadow-lg" onclick="showMilestoneDetail(${star})">
+                            <span class="font-gaming font-bold text-lg md:text-2xl text-white drop-shadow-md">${isMax ? '30+' : star}</span>
+                        </div>
+                        <div class="mt-1 text-center h-4 flex items-center justify-center z-20">
+                            ${displayReward ? `<span class="text-[8px] md:text-[10px] font-bold text-green-400 bg-black/80 px-2 py-0.5 rounded border border-green-900 shadow truncate max-w-[150px]">${displayReward}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                mapEl.appendChild(nodeC);
+            }
+        };
+
+        window.renderLeaderboard = () => {
+            window.recalculateGuildStars(); const q = (document.getElementById('lb-search')?.value || '').toLowerCase();
+            const container = document.getElementById('lb-content'); if(!container) return;
+            let html = '';
+
+            if(window.activeLbTab === 'players') {
+                let sorted = [...window.playersData].sort((a, b) => window.getPlayerStars(b, window.activeViewMonth) - window.getPlayerStars(a, window.activeViewMonth));
+                if(q) sorted = sorted.filter(p => p.name.toLowerCase().includes(q) || (window.guildsData.find(g => g.id === p.guild_id)?.name || '').toLowerCase().includes(q));
+                if(sorted.length === 0) html = '<div class="text-center text-gray-500 italic py-8">No players found.</div>';
+                
+                sorted.forEach((p, i) => {
+                    const pStars = window.getPlayerStars(p, window.activeViewMonth);
+                    const rank = window.getRankInfo(pStars); const guild = window.guildsData.find(g => g.id === p.guild_id);
+                    let medal = `<div class="w-8 h-8 flex items-center justify-center font-gaming font-bold text-gray-400 bg-gray-800 rounded-full border border-gray-600">${i+1}</div>`;
+                    if(i===0) medal = `<div class="w-8 h-8 flex items-center justify-center font-gaming font-bold text-white bg-yellow-500 rounded-full glow-box border border-yellow-300">1</div>`;
+                    else if(i===1) medal = `<div class="w-8 h-8 flex items-center justify-center font-gaming font-bold text-white bg-gray-400 rounded-full border border-gray-200">2</div>`;
+                    else if(i===2) medal = `<div class="w-8 h-8 flex items-center justify-center font-gaming font-bold text-white bg-orange-700 rounded-full border border-orange-500">3</div>`;
+
+                    html += `
+                        <div class="glass-panel p-3 md:p-4 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-gray-900/50 transition border border-gray-800" onclick="showPlayerProfile('${p.id}')">
+                            ${medal}<img src="${p.avatar}" class="w-12 h-12 rounded-full object-cover border-2 ${rank.colorClass}">
+                            <div class="flex-grow min-w-0"><div class="font-bold text-lg text-white truncate">${p.name}</div><div class="text-xs text-gray-400 truncate flex items-center gap-1">${guild && guild.logo ? `<img src="${guild.logo}" class="w-3 h-3 rounded-full object-cover inline">` : ''}${guild ? guild.name : 'No Team'}</div></div>
+                            <div class="text-right"><div class="font-gaming font-bold text-2xl ${rank.colorClass} glow-text">${pStars} ⭐</div><div class="text-[10px] font-bold ${rank.colorClass} tracking-widest">${rank.name}</div></div>
+                        </div>
+                    `;
+                });
+            } else {
+                let sorted = [...window.guildsData].sort((a, b) => (b.totalStars || 0) - (a.totalStars || 0));
+                if(q) sorted = sorted.filter(g => g.name.toLowerCase().includes(q));
+                if(sorted.length === 0) html = '<div class="text-center text-gray-500 italic py-8">No teams found.</div>';
+
+                sorted.forEach((g, i) => {
+                    const members = window.playersData.filter(p => p.guild_id === g.id);
+                    let medal = `<div class="w-8 h-8 flex items-center justify-center font-gaming font-bold text-gray-400 bg-gray-800 rounded border border-gray-600">${i+1}</div>`;
+                    if(i===0) medal = `<div class="w-8 h-8 flex items-center justify-center font-gaming font-bold text-black bg-yellow-500 rounded shadow-[0_0_10px_#f59e0b]">1</div>`;
+
+                    html += `
+                        <div class="glass-panel p-4 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-gray-800 mb-3 cursor-pointer hover:bg-gray-900/50" onclick="showGuildProfile('${g.id}')">
+                            <div class="flex items-center gap-4 w-full md:w-auto">${medal}${g.logo ? `<img src="${g.logo}" class="w-10 h-10 rounded-full object-cover border-2 border-yellow-500 shadow-md">` : ''}<div><div class="font-gaming font-bold text-xl text-white tracking-widest">${g.name}</div><div class="text-xs text-gray-400">${members.length} Members</div></div></div>
+                            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end"><div class="flex -space-x-3">${members.slice(0,4).map(m => `<img src="${m.avatar}" class="w-8 h-8 rounded-full border-2 border-gray-800 object-cover">`).join('')}${members.length > 4 ? `<div class="w-8 h-8 rounded-full border-2 border-gray-800 bg-gray-700 flex items-center justify-center text-[10px] font-bold text-white">+${members.length-4}</div>` : ''}</div><div class="text-right"><div class="font-gaming font-bold text-2xl text-yellow-500 glow-text">${g.totalStars || 0} ⭐</div><div class="text-[10px] font-bold text-gray-400 tracking-widest">TOTAL</div></div></div>
+                        </div>
+                    `;
+                });
+            }
+            container.innerHTML = html;
+        };
+
+        window.renderHome = () => {
+            window.recalculateGuildStars();
+            
+            const topP = [...window.playersData].sort((a, b) => window.getPlayerStars(b, window.activeViewMonth) - window.getPlayerStars(a, window.activeViewMonth)).slice(0, 3);
+            const elTopP = document.getElementById('home-top-players');
+            if(elTopP) {
+                elTopP.innerHTML = topP.map((p, i) => {
+                    const pStars = window.getPlayerStars(p, window.activeViewMonth); const rank = window.getRankInfo(pStars); const guild = window.guildsData.find(g => g.id === p.guild_id);
+                    return `<div class="flex items-center gap-3 bg-black/50 p-2 rounded-lg border border-gray-800 cursor-pointer hover:bg-gray-800" onclick="showPlayerProfile('${p.id}')"><div class="font-gaming font-bold text-gray-500 w-4">${i+1}</div><img src="${p.avatar}" class="w-10 h-10 rounded-full border border-gray-600 object-cover"><div class="flex-grow min-w-0"><div class="font-bold text-sm text-white truncate">${p.name}</div><div class="text-[10px] text-gray-400 truncate">${guild ? guild.name : 'No Team'}</div></div><div class="text-right"><div class="font-bold text-sm ${rank.colorClass}">${pStars} ⭐</div></div></div>`;
+                }).join('');
+            }
+
+            const topG = [...window.guildsData].sort((a, b) => (b.totalStars || 0) - (a.totalStars || 0)).slice(0, 3);
+            const elTopG = document.getElementById('home-top-guilds');
+            if(elTopG) {
+                elTopG.innerHTML = topG.map((g, i) => `<div class="flex items-center gap-3 bg-black/50 p-3 rounded-lg border border-gray-800 cursor-pointer hover:bg-gray-800" onclick="showGuildProfile('${g.id}')"><div class="font-gaming font-bold text-gray-500 w-4">${i+1}</div>${g.logo ? `<img src="${g.logo}" class="w-8 h-8 rounded-full object-cover">` : ''}<div class="flex-grow min-w-0"><div class="font-bold text-sm text-white truncate tracking-widest font-gaming">${g.name}</div></div><div class="text-right"><div class="font-bold text-sm text-yellow-500">${g.totalStars || 0} ⭐</div></div></div>`).join('');
+            }
+        };
+
+        window.showPlayerProfile = (id) => {
+            const p = window.playersData.find(x => x.id === id); if(!p) return;
+            const pStars = window.getPlayerStars(p, window.activeViewMonth); const rank = window.getRankInfo(pStars); const guild = window.guildsData.find(g => g.id === p.guild_id);
+            const isMax = pStars >= 30; const pct = isMax ? 100 : (pStars / 30) * 100;
+            const highestReward = window.rewardsData.filter(r => r.star <= pStars && (r.name || r.name2)).sort((a,b) => b.star - a.star)[0];
+            const nextReward = window.rewardsData.filter(r => r.star > pStars && (r.name || r.name2)).sort((a,b) => a.star - b.star)[0];
+
+            let rewardHtml = `<div class="mt-4 glass-panel p-4 rounded-xl border border-gray-700 text-left space-y-3">`;
+            if (highestReward) {
+                let dN = highestReward.name || ''; if(highestReward.name && highestReward.name2) dN += ' & ' + highestReward.name2; else if(highestReward.name2) dN = highestReward.name2;
+                rewardHtml += `<div><div class="text-[10px] text-green-400 font-bold tracking-widest uppercase mb-1">LATEST REWARD (⭐ ${highestReward.star})</div><div class="text-sm font-bold text-white leading-tight">${dN}</div></div>`;
+            } else rewardHtml += `<div><div class="text-[10px] text-gray-500 font-bold tracking-widest uppercase mb-1">LATEST REWARD</div><div class="text-xs text-gray-500 italic">Belum mencapai milestone hadiah.</div></div>`;
+            
+            if (nextReward) {
+                let dN = nextReward.name || ''; if(nextReward.name && nextReward.name2) dN += ' & ' + nextReward.name2; else if(nextReward.name2) dN = nextReward.name2;
+                rewardHtml += `<div class="border-t border-gray-800 pt-3"><div class="text-[10px] text-blue-400 font-bold tracking-widest uppercase mb-1">NEXT REWARD (⭐ ${nextReward.star})</div><div class="text-sm font-bold text-gray-300 leading-tight">${dN}</div></div>`;
+            } else if (isMax) rewardHtml += `<div class="border-t border-gray-800 pt-3"><div class="text-[10px] text-yellow-400 font-bold tracking-widest uppercase mb-1">NEXT REWARD</div><div class="text-xs text-gray-400 font-gaming">IMMORTAL MAXED</div></div>`;
+            rewardHtml += `</div>`;
+
+            document.getElementById('profile-content').innerHTML = `
+                <div class="relative w-24 h-24 mx-auto mb-4"><img src="${p.avatar}" class="w-full h-full rounded-full object-cover border-4 ${rank.colorClass} shadow-[0_0_20px_currentColor]"><div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-black border ${rank.colorClass} px-3 py-1 rounded-full font-bold text-xs whitespace-nowrap glow-box">${rank.name}</div></div>
+                <h2 class="font-gaming font-bold text-2xl text-white mt-6">${p.name}</h2>
+                <div class="text-sm font-bold text-gray-400 tracking-widest mt-1 flex items-center justify-center gap-2">${guild && guild.logo ? `<img src="${guild.logo}" class="w-4 h-4 rounded-full object-cover">` : ''}${guild ? guild.name : 'NO TEAM'}</div>
+                <div class="mt-6 glass-panel p-4 rounded-xl border border-gray-700"><div class="flex justify-between items-end mb-2"><div class="text-xs font-bold text-gray-400 tracking-widest">PROGRESS (${window.activeViewMonth})</div><div class="font-gaming font-bold text-xl ${rank.colorClass}">${pStars} <span class="text-sm text-gray-500">/ 30 ⭐</span></div></div><div class="w-full h-3 bg-gray-800 rounded-full overflow-hidden"><div class="h-full ${rank.bgClass} transition-all duration-1000" style="width: ${pct}%; background-color: currentColor; opacity: 0.8; color: ${isMax ? '#e2e8f0' : rank.colorClass.replace('rank-', 'bg-')}"></div></div>${isMax ? '<div class="text-xs text-yellow-400 font-bold mt-3 animate-pulse">IMMORTAL RANK UNLOCKED!</div>' : ''}</div>
+                ${rewardHtml}
+            `;
+            document.getElementById('modal-profile').classList.add('active');
+        };
+
+        window.showGuildProfile = (guildId) => {
+            const guild = window.guildsData.find(g => g.id === guildId); if(!guild) return;
+            const members = window.playersData.filter(p => p.guild_id === guildId).sort((a,b) => window.getPlayerStars(b, window.activeViewMonth) - window.getPlayerStars(a, window.activeViewMonth));
+            let html = `<div class="mb-4">${guild.logo ? `<img src="${guild.logo}" class="w-16 h-16 rounded-full mx-auto mb-2 object-cover border-2 border-yellow-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]">` : ''}<h2 class="font-gaming font-bold text-2xl md:text-3xl text-white tracking-widest uppercase">${guild.name}</h2><div class="font-gaming font-bold text-3xl text-yellow-500 glow-text mt-2">${guild.totalStars || 0} ⭐</div><div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">TOTAL STARS (${window.activeViewMonth})</div></div><div class="w-full h-px bg-gray-700 my-4"></div><div class="text-left mb-2 text-[10px] font-bold text-gray-400 tracking-widest">MEMBERS (${members.length})</div><div class="space-y-2 max-h-[50vh] overflow-y-auto pr-1 hide-scrollbar">`;
+            if(members.length === 0) html += `<div class="text-xs text-gray-500 italic text-center py-4">Belum ada anggota.</div>`;
+            else members.forEach((m, i) => { const s = window.getPlayerStars(m, window.activeViewMonth); const r = window.getRankInfo(s); html += `<div class="flex items-center gap-3 bg-black border border-gray-800 p-2 rounded-lg cursor-pointer hover:bg-gray-900 transition" onclick="closeModal('modal-guild'); showPlayerProfile('${m.id}')"><div class="font-bold text-gray-500 text-[10px] w-3 text-center">${i+1}</div><img src="${m.avatar}" class="w-8 h-8 rounded-full border border-gray-600 object-cover"><div class="flex-grow min-w-0 text-left"><div class="font-bold text-white text-xs truncate">${m.name}</div><div class="text-[9px] ${r.colorClass} truncate">${r.name}</div></div><div class="text-right"><div class="text-xs font-bold text-yellow-500">${s} ⭐</div></div></div>`; });
+            html += `</div>`; document.getElementById('guild-modal-content').innerHTML = html; document.getElementById('modal-guild').classList.add('active');
+        };
+
+        window.showMilestoneDetail = (star) => {
+            const ri = window.rewardsData.find(r => r.star === star); const rank = window.getRankInfo(star);
+            const ph = window.playersData.filter(p => star === 30 ? window.getPlayerStars(p, window.activeViewMonth) >= 30 : window.getPlayerStars(p, window.activeViewMonth) === star);
+            
+            let rH = '<div class="text-xs text-gray-500 italic mb-4">Tidak ada hadiah di milestone ini.</div>';
+            if(ri && (ri.name || ri.name2)) { rH = '<div class="bg-gray-900 border border-gray-700 rounded-lg p-3 text-left mb-4 space-y-2">'; if(ri.name) rH += `<div><div class="text-[10px] text-green-400 font-bold">REWARD UTAMA</div><div class="text-sm font-bold text-white">${ri.name}</div>${ri.desc?`<div class="text-[10px] text-gray-400 mt-0.5">${ri.desc}</div>`:''}</div>`; if(ri.name2) { if(ri.name) rH += '<div class="w-full h-px bg-gray-700 my-1"></div>'; rH += `<div><div class="text-[10px] text-blue-400 font-bold">REWARD TAMBAHAN</div><div class="text-sm font-bold text-white">${ri.name2}</div>${ri.desc2?`<div class="text-[10px] text-gray-400 mt-0.5">${ri.desc2}</div>`:''}</div>`; } rH += '</div>'; }
+            
+            let pH = '<div class="text-xs text-gray-500 italic">Belum ada player yang berada di titik ini.</div>';
+            if(ph.length > 0) { pH = '<div class="space-y-2 max-h-[30vh] overflow-y-auto pr-1 text-left hide-scrollbar">'; ph.forEach(p => { const guild = window.guildsData.find(g => g.id === p.guild_id); const pS = window.getPlayerStars(p, window.activeViewMonth); pH += `<div class="flex items-center gap-3 bg-black border border-gray-800 p-2 rounded-lg cursor-pointer hover:bg-gray-900 transition" onclick="closeModal('modal-milestone'); showPlayerProfile('${p.id}')"><img src="${p.avatar}" class="w-8 h-8 rounded-full border border-gray-600 object-cover"><div class="flex-grow min-w-0"><div class="font-bold text-white text-xs truncate">${p.name}</div><div class="text-[9px] text-gray-400 truncate">${guild ? guild.name : 'No Team'}</div></div><div class="text-right"><div class="text-[10px] font-bold ${rank.colorClass}">${pS} ⭐</div></div></div>`; }); pH += '</div>'; }
+            
+            document.getElementById('milestone-content').innerHTML = `<div class="mb-4"><h3 class="font-gaming text-2xl font-bold text-white glow-text">⭐ BINTANG ${star === 30 ? '30+' : star}</h3><div class="text-xs font-bold ${rank.colorClass} tracking-widest">${rank.name} ZONE</div></div>${rH}<div class="text-left mb-2 text-[10px] font-bold text-gray-400 tracking-widest">PLAYER DI SINI (${ph.length})</div>${pH}`;
+            document.getElementById('modal-milestone').classList.add('active');
+        };
+
+        window.renderAdminPanes = () => {
+            window.recalculateGuildStars(); document.getElementById('admin-score-month-lbl').innerText = window.activeViewMonth;
+            
+            // Score Matrix
+            const table = document.getElementById('admin-score-table');
+            let thHtml = '<tr><th class="p-2 border border-gray-700 bg-gray-900 sticky left-0 z-10 w-32">Player</th><th class="p-2 border border-gray-700 bg-gray-900 text-center text-yellow-500">Tot</th>';
+            for(let i=1; i<=31; i++) thHtml += `<th class="p-1 border border-gray-700 bg-gray-900 text-center w-8">${i}</th>`; thHtml += '</tr>';
+            
+            let tbody = '';
+            const renderRows = (ps) => ps.map(p => {
+                const ph = (p.history && p.history[window.activeViewMonth]) ? p.history[window.activeViewMonth] : {};
+                let row = `<tr><td class="p-2 border border-gray-700 bg-gray-900 sticky left-0 z-10 font-bold truncate max-w-[120px]">${p.name}</td><td class="p-2 border border-gray-700 text-center font-bold text-yellow-500">${window.getPlayerStars(p, window.activeViewMonth)}</td>`;
+                for(let i=1; i<=31; i++) { const v = ph[i] || 0; row += `<td class="p-1 border border-gray-700 text-center cursor-pointer hover:bg-gray-700 transition ${v>0 ? 'bg-blue-900/50 text-blue-300 font-bold' : 'text-gray-600'}" onclick="openScoreEditor('${p.id}', ${i})">${v>0?v:'-'}</td>`; }
+                return row + `</tr>`;
+            }).join('');
+
+            window.guildsData.forEach(g => { const ms = window.playersData.filter(p => p.guild_id === g.id); if(ms.length > 0) { tbody += `<tr><td colspan="33" class="bg-gray-800 p-2 font-gaming font-bold text-blue-400 tracking-widest uppercase">${g.name}</td></tr>`; tbody += renderRows(ms); }});
+            const noG = window.playersData.filter(p => !p.guild_id); if(noG.length > 0) { tbody += `<tr><td colspan="33" class="bg-gray-800 p-2 font-gaming font-bold text-gray-400 tracking-widest uppercase">INDEPENDENT (NO TEAM)</td></tr>`; tbody += renderRows(noG); }
+            table.innerHTML = `<thead>${thHtml}</thead><tbody>${tbody}</tbody>`;
+
+            // Players Edit (with file upload)
+            document.getElementById('add-player-guild').innerHTML = '<option value="">No Team</option>' + window.guildsData.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+            document.getElementById('admin-players-list').innerHTML = window.playersData.map(p => `
+                <div class="bg-gray-900 border border-gray-700 p-4 rounded flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <img src="${p.avatar}" class="w-10 h-10 rounded-full border border-gray-600 object-cover">
+                        <div class="flex-grow flex flex-col gap-1">
+                            <input type="text" value="${p.name}" onchange="updatePlayer('${p.id}', 'name', this.value)" class="bg-black border border-gray-700 rounded px-2 py-1 text-sm font-bold text-white w-full max-w-[150px] outline-none">
+                            <input type="file" accept="image/*" onchange="handleUpdatePlayerImage('${p.id}', this)" class="text-[10px] text-gray-400 w-full max-w-[150px]">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full md:w-auto justify-between">
+                        <select onchange="updatePlayer('${p.id}', 'guild_id', this.value)" class="bg-black border border-gray-700 rounded px-2 py-1 text-xs text-white max-w-[120px]"><option value="">No Team</option>${window.guildsData.map(g => `<option value="${g.id}" ${g.id === p.guild_id ? 'selected' : ''}>${g.name}</option>`).join('')}</select>
+                        <button onclick="deletePlayer('${p.id}')" class="text-red-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Guilds Edit (with file upload)
+            document.getElementById('admin-guilds-list').innerHTML = window.guildsData.map(g => `
+                <div class="bg-gray-900 border border-gray-700 p-3 rounded flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex-grow flex gap-3 items-center w-full">
+                        ${g.logo ? `<img src="${g.logo}" class="w-10 h-10 rounded-full object-cover border border-gray-600">` : `<div class="w-10 h-10 rounded-full bg-gray-800"></div>`}
+                        <div class="flex flex-col gap-1 w-full">
+                            <input type="text" value="${g.name}" onchange="updateGuild('${g.id}', 'name', this.value)" class="bg-black border border-gray-700 rounded px-2 py-1 text-sm font-bold text-white max-w-[200px] outline-none">
+                            <input type="file" accept="image/*" onchange="handleUpdateGuildLogo('${g.id}', this)" class="text-[10px] text-gray-400 w-full max-w-[200px]">
+                        </div>
+                        <span class="text-xs text-yellow-500 font-bold ml-auto">${g.totalStars || 0} ⭐</span>
+                    </div>
+                    <button onclick="deleteGuild('${g.id}')" class="text-red-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+
+            // Rewards
+            document.getElementById('admin-rewards-list').innerHTML = window.rewardsData.map(r => `
+                <div class="bg-gray-900 border border-gray-700 p-3 rounded flex flex-col gap-3 mb-2">
+                    <div class="flex justify-between items-center border-b border-gray-800 pb-2"><div class="font-gaming font-bold text-yellow-500 text-sm md:text-base">⭐ BINTANG ${r.star}</div><button onclick="saveReward(${r.star})" class="bg-green-600 hover:bg-green-500 px-4 py-1.5 rounded text-xs font-bold text-white shadow-lg"><i class="fa-solid fa-save mr-1"></i> SAVE</button></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1"><label class="text-[10px] text-green-400 font-bold">REWARD UTAMA</label><input type="text" id="rew-name-${r.star}" value="${r.name || ''}" placeholder="Cth: Rp 50.000" class="w-full bg-black border border-gray-600 rounded px-2 py-1 text-xs text-white"><input type="text" id="rew-desc-${r.star}" value="${r.desc || ''}" placeholder="Deskripsi (Opsional)" class="w-full bg-black border border-gray-600 rounded px-2 py-1 text-xs text-white"></div>
+                        <div class="space-y-1"><label class="text-[10px] text-blue-400 font-bold">REWARD TAMBAHAN</label><input type="text" id="rew-name2-${r.star}" value="${r.name2 || ''}" placeholder="Cth: Voucher" class="w-full bg-black border border-gray-600 rounded px-2 py-1 text-xs text-white"><input type="text" id="rew-desc2-${r.star}" value="${r.desc2 || ''}" placeholder="Deskripsi (Opsional)" class="w-full bg-black border border-gray-600 rounded px-2 py-1 text-xs text-white"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Pins & Content
+            document.getElementById('admin-pins-list').innerHTML = window.validPins.map((pin, i) => `<div class="flex justify-between items-center bg-black border border-gray-800 p-2 rounded"><span class="font-mono text-sm tracking-widest text-gray-300">${pin}</span>${window.validPins.length > 1 ? `<button onclick="removePin(${i})" class="text-red-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>` : '<span class="text-xs text-gray-600">Default</span>'}</div>`).join('');
+            document.getElementById('edit-content-title').value = window.siteContent.title; document.getElementById('edit-content-maptitle').value = window.siteContent.mapTitle;
+            document.getElementById('edit-content-mapdesc').value = window.siteContent.mapDesc; document.getElementById('edit-content-herotitle').value = window.siteContent.heroTitle;
+            document.getElementById('edit-content-herosub').value = window.siteContent.heroSub;
+            document.getElementById('edit-stat1-val').value = window.siteContent.stat1Val; document.getElementById('edit-stat1-lbl').value = window.siteContent.stat1Lbl;
+            document.getElementById('edit-stat2-val').value = window.siteContent.stat2Val; document.getElementById('edit-stat2-lbl').value = window.siteContent.stat2Lbl;
+            document.getElementById('edit-stat3-val').value = window.siteContent.stat3Val; document.getElementById('edit-stat3-lbl').value = window.siteContent.stat3Lbl;
+            document.getElementById('edit-stat4-val').value = window.siteContent.stat4Val; document.getElementById('edit-stat4-lbl').value = window.siteContent.stat4Lbl;
+        };
+
+        window.openScoreEditor = (pid, dateNum) => {
+            const p = window.playersData.find(x => x.id === pid); if(!p) return;
+            document.getElementById('edit-score-pid').value = pid; document.getElementById('edit-score-date').value = dateNum;
+            document.getElementById('edit-score-desc').innerText = `${p.name} - Tgl ${dateNum} (${window.activeViewMonth})`;
+            const cv = (p.history && p.history[window.activeViewMonth] && p.history[window.activeViewMonth][dateNum]) ? p.history[window.activeViewMonth][dateNum] : 0;
+            const sel = document.getElementById('edit-score-val'); sel.innerHTML = ''; for(let i=0; i<=50; i++) sel.innerHTML += `<option value="${i}" ${i === cv ? 'selected' : ''}>${i}</option>`;
+            document.getElementById('modal-edit-score').classList.add('active');
+        };
+
+        window.saveDailyScore = async () => {
+            if(!auth.currentUser) return;
+            const pid = document.getElementById('edit-score-pid').value; const dateNum = document.getElementById('edit-score-date').value;
+            const val = parseInt(document.getElementById('edit-score-val').value) || 0;
+            const p = window.playersData.find(x => x.id === pid);
+            if(p) {
+                const updatedHistory = p.history || {}; if(!updatedHistory[window.activeViewMonth]) updatedHistory[window.activeViewMonth] = {};
+                updatedHistory[window.activeViewMonth][dateNum] = val;
+                await updateDoc(getDocRef('players', pid), { history: updatedHistory });
+                window.closeModal('modal-edit-score'); window.showMessage("SUKSES", "Skor berhasil disimpan ke database.");
+            }
+        };
+
+        window.addPlayer = async () => {
+            if(!auth.currentUser) return;
+            const name = document.getElementById('add-player-name').value;
+            const fileIn = document.getElementById('add-player-file');
+            const guildId = document.getElementById('add-player-guild').value;
+            if(name) {
+                let avatar = `https://placehold.co/100x100/1a1a2e/ffffff?text=${name.charAt(0)}`;
+                if(fileIn.files && fileIn.files.length > 0) avatar = await window.fileToBase64(fileIn.files[0]);
+                const newId = window.generateId();
+                await setDoc(getDocRef('players', newId), { name, avatar, history: {}, guild_id: guildId });
+                document.getElementById('add-player-name').value = ''; fileIn.value = '';
+                window.showMessage("SUKSES", "Player ditambahkan ke database.");
+            }
+        };
+
+        window.updatePlayer = async (id, field, value) => { if(auth.currentUser) await updateDoc(getDocRef('players', id), { [field]: value }); };
+        window.handleUpdatePlayerImage = async (id, input) => { if(input.files && input.files.length > 0) { const b64 = await window.fileToBase64(input.files[0]); window.updatePlayer(id, 'avatar', b64); } };
+        window.deletePlayer = async (id) => { if(auth.currentUser) { await deleteDoc(getDocRef('players', id)); window.showMessage("TERHAPUS", "Data player dihapus permanen."); } };
+
+        window.addGuild = async () => {
+            if(!auth.currentUser) return;
+            const name = document.getElementById('add-guild-name').value;
+            const fileIn = document.getElementById('add-guild-logo');
+            if(name) {
+                let logo = ''; if(fileIn.files && fileIn.files.length > 0) logo = await window.fileToBase64(fileIn.files[0]);
+                const newId = window.generateId();
+                await setDoc(getDocRef('guilds', newId), { name, logo });
+                document.getElementById('add-guild-name').value = ''; fileIn.value = '';
+                window.showMessage("SUKSES", "Team dibuat dan tersimpan.");
+            }
+        };
+
+        window.updateGuild = async (id, field, value) => { if(auth.currentUser) await updateDoc(getDocRef('guilds', id), { [field]: value }); };
+        window.handleUpdateGuildLogo = async (id, input) => { if(input.files && input.files.length > 0) { const b64 = await window.fileToBase64(input.files[0]); window.updateGuild(id, 'logo', b64); } };
+        window.deleteGuild = async (id) => {
+            if(auth.currentUser) {
+                await deleteDoc(getDocRef('guilds', id));
+                window.playersData.forEach(async p => { if(p.guild_id === id) await updateDoc(getDocRef('players', p.id), { guild_id: '' }); });
+                window.showMessage("TERHAPUS", "Team dihapus permanen.");
+            }
+        };
+
+        window.saveReward = async (star) => {
+            if(!auth.currentUser) return;
+            const payload = {
+                name: document.getElementById(`rew-name-${star}`).value, desc: document.getElementById(`rew-desc-${star}`).value,
+                name2: document.getElementById(`rew-name2-${star}`).value, desc2: document.getElementById(`rew-desc2-${star}`).value, star: star
+            };
+            await setDoc(getDocRef('rewards', star.toString()), payload);
+            window.showMessage("SUKSES", `Reward Bintang ${star} tersimpan.`);
+        };
+
+        window.addPin = async () => {
+            if(!auth.currentUser) return;
+            const val = document.getElementById('add-pin-input').value;
+            if(val && window.validPins.length < 10 && !window.validPins.includes(val)) {
+                const newPins = [...window.validPins, val];
+                await setDoc(getDocRef('config', 'security'), { pins: newPins }); document.getElementById('add-pin-input').value = '';
+            }
+        };
+        window.removePin = async (idx) => { if(auth.currentUser && window.validPins.length > 1) { const newPins = [...window.validPins]; newPins.splice(idx, 1); await setDoc(getDocRef('config', 'security'), { pins: newPins }); } };
+
+        window.saveSiteContent = async () => {
+            if(!auth.currentUser) return;
+            const updated = {
+                title: document.getElementById('edit-content-title').value, mapTitle: document.getElementById('edit-content-maptitle').value,
+                mapDesc: document.getElementById('edit-content-mapdesc').value, heroTitle: document.getElementById('edit-content-herotitle').value,
+                heroSub: document.getElementById('edit-content-herosub').value,
+                stat1Val: document.getElementById('edit-stat1-val').value, stat1Lbl: document.getElementById('edit-stat1-lbl').value,
+                stat2Val: document.getElementById('edit-stat2-val').value, stat2Lbl: document.getElementById('edit-stat2-lbl').value,
+                stat3Val: document.getElementById('edit-stat3-val').value, stat3Lbl: document.getElementById('edit-stat3-lbl').value,
+                stat4Val: document.getElementById('edit-stat4-val').value, stat4Lbl: document.getElementById('edit-stat4-lbl').value
+            };
+            await setDoc(getDocRef('config', 'main'), updated);
+            window.showMessage("SUKSES", "Konten situs diperbarui.");
+        };
+
+        const setupRealtimeListeners = () => {
+            onSnapshot(getCol('players'), (snap) => { window.playersData = snap.docs.map(d => ({id: d.id, ...d.data()})); window.renderAll(); }, (e) => console.error(e));
+            onSnapshot(getCol('guilds'), (snap) => { window.guildsData = snap.docs.map(d => ({id: d.id, ...d.data()})); window.renderAll(); }, (e) => console.error(e));
+            onSnapshot(getCol('rewards'), (snap) => {
+                if(snap.empty) {
+                    // Seed rewards pertama kali jika kosong
+                    for(let i=0; i<=30; i++) setDoc(getDocRef('rewards', i.toString()), { star: i, name: "", desc: "", name2: "", desc2: "" });
+                } else {
+                    window.rewardsData = snap.docs.map(d => ({id: d.id, ...d.data()})); window.renderAll();
+                }
+            }, (e) => console.error(e));
+            onSnapshot(getDocRef('config', 'main'), (docSnap) => {
+                if(docSnap.exists()) { window.siteContent = docSnap.data(); window.renderAll(); }
+                else setDoc(getDocRef('config', 'main'), window.siteContent);
+            }, (e) => console.error(e));
+            onSnapshot(getDocRef('config', 'security'), (docSnap) => {
+                if(docSnap.exists() && docSnap.data().pins) window.validPins = docSnap.data().pins;
+            }, (e) => console.error(e));
+        };
+
+        window.verifyAdmin = () => {
+            const pin = document.getElementById('admin-pin').value;
+            if(window.validPins.includes(pin)) { window.isAdmin = true; document.getElementById('admin-pin').value = ''; window.closeModal('modal-admin'); window.switchTab('admin-dashboard'); window.setAdminTab('players'); } 
+            else window.showMessage("AKSES DITOLAK", "Password salah!");
+        };
+        window.logoutAdmin = () => { window.isAdmin = false; window.switchTab('home'); };
+        
+        window.downloadMap = () => {
+            const ca = document.getElementById('modal-capture-area'); window.showMessage("MEMPROSES...", "Mengambil gambar pencapaian...");
+            ca.classList.add('hidden'); document.getElementById('modal-msg-ok-btn').classList.add('hidden');
+            setTimeout(() => {
+                const mc = document.getElementById('map-content'); const clone = mc.cloneNode(true);
+                const w = document.createElement('div'); w.style.position = 'absolute'; w.style.top = '-9999px'; w.style.left = '-9999px'; w.style.width = '600px'; w.style.backgroundColor = '#0a0a0f'; 
+                w.appendChild(clone); document.body.appendChild(w);
+                html2canvas(w, { backgroundColor: "#0a0a0f", scale: 2, useCORS: true, logging: false }).then(canvas => {
+                    document.body.removeChild(w); const img = canvas.toDataURL("image/png"); document.getElementById('capture-img-preview').src = img;
+                    const db = document.getElementById('capture-download-btn'); db.href = img; db.download = `Map_${window.activeViewMonth}.png`;
+                    document.getElementById('modal-message-title').innerText = "SELESAI"; document.getElementById('modal-message-text').innerText = "Gambar siap diunduh.";
+                    ca.classList.remove('hidden'); document.getElementById('modal-msg-ok-btn').classList.remove('hidden');
+                }).catch(e => { document.body.removeChild(w); window.showMessage("ERROR", "Gagal memproses gambar."); });
+            }, 600);
+        };
+
+        // Otentikasi dan Mulai
+        async function initApp() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined') await signInWithCustomToken(auth, __initial_auth_token);
+                else await signInAnonymously(auth);
+                if(auth.currentUser) setupRealtimeListeners();
+            } catch(e) { console.error("Gagal konek ke database:", e); }
+        }
+        
+        window.onload = () => {
+            // Pasang loading screen yang otomatis tertutup begitu render berjalan
+            const html = document.getElementById('lb-content');
+            if(html) html.innerHTML = '<div class="text-center py-10 text-gray-400 font-gaming animate-pulse">Menghubungkan ke Database...</div>';
+            initApp();
+        };
+    </script>
+</body>
+</html>
