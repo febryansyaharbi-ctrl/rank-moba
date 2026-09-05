@@ -24,13 +24,12 @@
             overflow-x: hidden;
             background-image: 
                 radial-gradient(circle at 15% 50%, rgba(30, 20, 5, 0.4) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(10, 15, 30, 0.5) 0%, transparent 50%),
-                url('https://www.transparenttextures.com/patterns/stardust.png');
+                radial-gradient(circle at 85% 30%, rgba(10, 15, 30, 0.5) 0%, transparent 50%);
+            background-attachment: fixed;
         }
 
         .font-epic { font-family: 'Cinzel', serif; }
         
-        /* Glass/Panel Styling Rune Realms Style */
         .epic-panel {
             background: linear-gradient(180deg, rgba(20,20,25,0.95) 0%, rgba(10,10,12,0.98) 100%);
             border: 1px solid rgba(212, 175, 55, 0.4);
@@ -58,13 +57,18 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+        /* Background Scrolling for Map */
+        #map-container {
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+            background-attachment: local;
+        }
+
         .vertical-text-right { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); letter-spacing: 0.2em; }
         .vertical-text-left { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); letter-spacing: 0.2em; }
 
         .star-node { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
         .star-node:hover { transform: scale(1.15); box-shadow: 0 0 25px currentColor, inset 0 0 10px currentColor; }
 
-        /* Modals */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center;
@@ -86,32 +90,117 @@
         /* MLBB Ranks Colors */
         .rank-payah { color: #9ca3af; border-color: #9ca3af; }
         .bg-payah { background: rgba(156, 163, 175, 0.15); }
-        
         .rank-epic { color: #22c55e; border-color: #22c55e; }
         .bg-epic { background: rgba(34, 197, 94, 0.15); }
-        
         .rank-legend { color: #a855f7; border-color: #a855f7; }
         .bg-legend { background: rgba(168, 85, 247, 0.15); }
-        
         .rank-mythic { color: #eab308; border-color: #eab308; }
         .bg-mythic { background: rgba(234, 179, 8, 0.15); }
-        
         .rank-honor { color: #ec4899; border-color: #ec4899; }
         .bg-honor { background: rgba(236, 72, 153, 0.15); }
-        
         .rank-glory { color: #ef4444; border-color: #ef4444; }
         .bg-glory { background: rgba(239, 68, 68, 0.15); }
-        
         .rank-immortal { color: #60a5fa; border-color: #60a5fa; text-shadow: 0 0 15px #3b82f6; }
         .bg-immortal { background: rgba(96, 165, 250, 0.15); box-shadow: inset 0 0 20px rgba(59,130,246,0.3); }
-
-        /* Fix file inputs visually */
+        
         input[type="file"]::file-selector-button {
             background-color: #d4af37; color: black; border: none; padding: 4px 10px; font-weight: bold; border-radius: 4px; cursor: pointer;
         }
     </style>
 </head>
 <body class="antialiased flex flex-col h-screen overflow-hidden">
+
+    <script>
+        // GLOBAL FUNCTIONS
+        window.switchTab = function(tabId) {
+            window.activeTab = tabId;
+            ['home', 'map', 'leaderboard', 'admin-dashboard'].forEach(t => {
+                const el = document.getElementById(`sec-${t}`);
+                if(el) el.classList.add('hidden');
+                
+                const btn = document.getElementById(`tab-${t}`);
+                if(btn) btn.classList.remove('active');
+            });
+            
+            const targetEl = document.getElementById(`sec-${tabId}`);
+            if(targetEl) targetEl.classList.remove('hidden');
+            
+            const targetBtn = document.getElementById(`tab-${tabId}`);
+            if(targetBtn) targetBtn.classList.add('active');
+
+            if(tabId === 'map') {
+                setTimeout(() => {
+                    const mapContainer = document.getElementById('map-container');
+                    if(mapContainer) mapContainer.scrollTo({ top: mapContainer.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            }
+            if(typeof window.renderAll === 'function') {
+                window.renderAll();
+            }
+        };
+
+        window.closeModal = function(id) {
+            const el = document.getElementById(id);
+            if(el) el.classList.remove('active');
+        };
+
+        window.showMessage = function(title, text) {
+            document.getElementById('modal-message-title').innerText = title;
+            document.getElementById('modal-message-text').innerText = text;
+            document.getElementById('modal-capture-area').classList.add('hidden');
+            document.getElementById('modal-msg-ok-btn').classList.remove('hidden');
+            document.getElementById('modal-message').classList.add('active');
+        };
+
+        window.setLbTab = function(tab) {
+            window.activeLbTab = tab;
+            const btnP = document.getElementById('btn-lb-players');
+            const btnG = document.getElementById('btn-lb-guilds');
+            
+            if(tab === 'players') {
+                btnP.className = 'epic-btn px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase';
+                btnG.className = 'bg-black/80 border border-yellow-600/30 text-gray-400 hover:text-yellow-500 px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase transition';
+            } else {
+                btnG.className = 'epic-btn px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase';
+                btnP.className = 'bg-black/80 border border-yellow-600/30 text-gray-400 hover:text-yellow-500 px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase transition';
+            }
+            if(typeof window.renderLeaderboard === 'function') window.renderLeaderboard();
+        };
+
+        window.setAdminTab = function(tab) {
+            ['players', 'players-edit', 'guilds', 'rewards', 'content', 'settings'].forEach(t => {
+                const pane = document.getElementById(`admin-pane-${t}`);
+                if(pane) pane.classList.add('hidden');
+                
+                const btn = document.getElementById(`admin-tab-${t}`);
+                if(btn) {
+                    btn.classList.remove('bg-yellow-600', 'text-black');
+                    btn.classList.add('bg-gray-900', 'text-gray-400');
+                }
+            });
+            const targetPane = document.getElementById(`admin-pane-${tab}`);
+            if(targetPane) targetPane.classList.remove('hidden');
+            
+            const targetBtn = document.getElementById(`admin-tab-${tab}`);
+            if(targetBtn) {
+                targetBtn.classList.remove('bg-gray-900', 'text-gray-400');
+                targetBtn.classList.add('bg-yellow-600', 'text-black');
+            }
+        };
+
+        window.handleImageUpload = function(inputEl, callback) {
+            if(!inputEl || !inputEl.files || !inputEl.files[0]) {
+                callback(null);
+                return;
+            }
+            const file = inputEl.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                callback(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        };
+    </script>
 
     <nav class="epic-panel sticky top-0 z-50 px-4 py-3 flex justify-between items-center border-b-2 border-yellow-600/50 shadow-[0_4px_20px_rgba(212,175,55,0.1)]">
         <div class="flex items-center gap-3">
@@ -123,7 +212,7 @@
         <div class="hidden md:flex gap-8 font-bold text-xs tracking-widest items-center text-gray-400 uppercase font-epic">
             <button onclick="switchTab('home')" class="nav-btn active hover:text-white" id="tab-home">HOME</button>
             <button onclick="switchTab('map')" class="nav-btn hover:text-white" id="tab-map">JOURNEY</button>
-            <button onclick="switchTab('leaderboard')" class="nav-btn hover:text-white" id="tab-leaderboard">CLASH</button>
+            <button onclick="switchTab('leaderboard')" class="nav-btn hover:text-white" id="tab-leaderboard">RANK</button>
             
             <div class="flex items-center gap-2 bg-black/80 border border-yellow-600/50 px-3 py-1.5 rounded shadow-inner">
                 <i class="fa-solid fa-calendar text-yellow-600"></i>
@@ -131,6 +220,9 @@
             </div>
         </div>
         <div class="flex gap-3 items-center">
+            <button onclick="window.generatePoster()" class="epic-btn text-xs md:text-sm px-3 py-1.5 rounded font-bold shadow-[0_0_10px_rgba(212,175,55,0.4)] transition flex items-center gap-2">
+                <i class="fa-solid fa-camera"></i><span class="hidden md:inline font-epic">CAPTURE</span>
+            </button>
             <button onclick="document.getElementById('modal-admin').classList.add('active')" class="bg-red-900/80 border border-red-600 hover:bg-red-700 text-red-200 hover:text-white px-3 py-1.5 rounded shadow-[0_0_10px_rgba(220,38,38,0.3)] text-xs font-bold transition flex items-center gap-2">
                 <i class="fa-solid fa-shield-halved"></i><span class="hidden md:inline font-epic">ADMIN</span>
             </button>
@@ -141,20 +233,20 @@
     <div id="mobile-menu" class="hidden absolute top-16 left-0 w-full epic-panel z-40 flex flex-col items-center py-4 gap-4 font-bold border-b-2 border-yellow-600/50 text-gray-300 uppercase text-sm font-epic shadow-2xl">
         <button onclick="switchTab('home'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 hover:text-yellow-500 transition">HOME</button>
         <button onclick="switchTab('map'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 hover:text-yellow-500 transition">JOURNEY</button>
-        <button onclick="switchTab('leaderboard'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 hover:text-yellow-500 transition">CLASH</button>
+        <button onclick="switchTab('leaderboard'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 hover:text-yellow-500 transition">RANK</button>
         <div class="w-full text-center py-2 border-t border-yellow-600/30 flex justify-center mt-2 pt-4">
             <input type="month" id="global-month-mobile" onchange="document.getElementById('global-month').value=this.value; changeMonth(); document.getElementById('mobile-menu').classList.add('hidden')" class="bg-black border border-yellow-600/50 text-sm text-yellow-500 font-bold px-4 py-2 rounded outline-none shadow-inner">
         </div>
     </div>
 
     <main class="flex-grow relative h-full w-full">
-        
         <div id="loading-screen" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/95 transition-opacity duration-500 hidden">
             <div class="w-16 h-16 border-4 border-yellow-600 border-t-yellow-200 rounded-full animate-spin mb-4"></div>
-            <h2 class="font-epic text-xl text-yellow-500 animate-pulse tracking-widest glow-text-gold">Connecting to Realm...</h2>
+            <h2 class="font-epic text-2xl md:text-3xl font-bold text-yellow-500 animate-pulse tracking-widest glow-text-gold drop-shadow-md">KAPAN IMO???</h2>
         </div>
 
-        <section id="sec-home" class="h-full overflow-y-auto p-4 md:p-8 space-y-12 pb-20 absolute w-full block">
+        <!-- HOME SECTION -->
+        <section id="sec-home" class="h-full overflow-y-auto p-4 md:p-8 space-y-12 pb-20 absolute w-full block bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]">
             <div class="text-center space-y-6 py-12 relative">
                 <div class="absolute inset-0 bg-yellow-500/10 blur-[100px] -z-10 rounded-full"></div>
                 <h2 class="font-epic text-4xl md:text-6xl font-black text-yellow-500 glow-text-gold tracking-wider uppercase drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]" id="hero-title">WELCOME TO THE REALM</h2>
@@ -166,28 +258,9 @@
                 </div>
             </div>
 
-            <!-- Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
-                <div class="epic-panel p-6 rounded text-center border-t-4 border-t-yellow-500 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-yellow-500/10 opacity-0 group-hover:opacity-100 transition"></div>
-                    <div class="text-4xl font-epic font-bold text-white mb-2 drop-shadow-lg" id="stat-players-val">0</div>
-                    <div class="text-xs text-yellow-600 font-bold tracking-widest uppercase font-epic" id="stat-players-lbl">PLAYERS</div>
-                </div>
-                <div class="epic-panel p-6 rounded text-center border-t-4 border-t-yellow-500 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-yellow-500/10 opacity-0 group-hover:opacity-100 transition"></div>
-                    <div class="text-4xl font-epic font-bold text-white mb-2 drop-shadow-lg" id="stat-milestones-val">30</div>
-                    <div class="text-xs text-yellow-600 font-bold tracking-widest uppercase font-epic" id="stat-milestones-lbl">MILESTONES</div>
-                </div>
-                <div class="epic-panel p-6 rounded text-center border-t-4 border-t-yellow-500 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-yellow-500/10 opacity-0 group-hover:opacity-100 transition"></div>
-                    <div class="text-4xl font-epic font-bold text-white mb-2 drop-shadow-lg" id="stat-ranks-val">7</div>
-                    <div class="text-xs text-yellow-600 font-bold tracking-widest uppercase font-epic" id="stat-ranks-lbl">RANKS</div>
-                </div>
-                <div class="epic-panel p-6 rounded text-center border-t-4 border-t-yellow-500 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-yellow-500/10 opacity-0 group-hover:opacity-100 transition"></div>
-                    <div class="text-4xl font-epic font-bold text-white mb-2 drop-shadow-lg" id="stat-comp-val">∞</div>
-                    <div class="text-xs text-yellow-600 font-bold tracking-widest uppercase font-epic" id="stat-comp-lbl">REWARDS</div>
-                </div>
+            <!-- Dynamic Stats Boxes Container -->
+            <div id="home-stats-container" class="grid gap-4 max-w-5xl mx-auto">
+                <!-- Injected via JS based on window.siteContent.stats -->
             </div>
             
             <!-- Top Lists -->
@@ -214,6 +287,7 @@
             </div>
         </section>
 
+        <!-- MAP SECTION -->
         <section id="sec-map" class="h-full w-full hidden absolute overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]">
             <div class="absolute top-4 left-4 z-20 pointer-events-none">
                 <div class="epic-panel px-4 py-3 rounded border-l-4 border-yellow-500 shadow-xl">
@@ -221,24 +295,19 @@
                     <p class="text-[9px] md:text-xs text-gray-300 font-bold uppercase mt-1" id="map-desc">Reach 30 stars to unlock IMMORTAL.</p>
                 </div>
             </div>
-            
-            <div class="absolute top-4 right-4 z-20">
-                <button onclick="downloadMap()" class="epic-btn px-4 py-2 rounded font-bold text-[10px] md:text-xs uppercase flex items-center gap-2">
-                    <i class="fa-solid fa-camera"></i> Capture
-                </button>
-            </div>
 
             <div id="map-container" class="absolute inset-0 h-full w-full overflow-y-auto overflow-x-hidden hide-scrollbar scroll-smooth">
                 <div id="map-content" class="relative w-full min-h-max max-w-lg mx-auto flex flex-col items-center pt-32 pb-40">
                     <div id="map-line" class="absolute top-0 bottom-0 w-2 bg-yellow-900/30 left-1/2 -translate-x-1/2 z-0 rounded-full border border-yellow-600/20 shadow-[0_0_15px_#d4af37]"></div>
-                    <div id="map-nodes" class="w-full flex flex-col justify-end gap-16 md:gap-24 relative z-10">
+                    <div id="map-nodes" class="w-full flex flex-col justify-end gap-16 md:gap-24 relative z-10 pt-16">
                         <!-- Nodes injected via JS -->
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="sec-leaderboard" class="h-full w-full hidden absolute overflow-y-auto p-4 md:p-8 pb-20">
+        <!-- LEADERBOARD SECTION -->
+        <section id="sec-leaderboard" class="h-full w-full hidden absolute overflow-y-auto p-4 md:p-8 pb-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]">
             <div class="max-w-4xl mx-auto space-y-8">
                 <div class="flex justify-center gap-4">
                     <button id="btn-lb-players" onclick="setLbTab('players')" class="epic-btn px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase">CHAMPIONS</button>
@@ -256,6 +325,7 @@
             </div>
         </section>
 
+        <!-- ADMIN SECTION -->
         <section id="sec-admin-dashboard" class="h-full w-full hidden absolute overflow-y-auto p-4 pb-20 bg-[#050508]">
             <div class="max-w-6xl mx-auto space-y-6">
                 <div class="flex justify-between items-center epic-panel p-4 rounded border-t-4 border-t-red-600">
@@ -272,7 +342,7 @@
                     <button onclick="setAdminTab('guilds')" id="admin-tab-guilds" class="px-5 py-2.5 rounded-t bg-gray-900 text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Teams</button>
                     <button onclick="setAdminTab('rewards')" id="admin-tab-rewards" class="px-5 py-2.5 rounded-t bg-gray-900 text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Rewards</button>
                     <button onclick="setAdminTab('content')" id="admin-tab-content" class="px-5 py-2.5 rounded-t bg-gray-900 text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Site Content</button>
-                    <button onclick="setAdminTab('settings')" id="admin-tab-settings" class="px-5 py-2.5 rounded-t bg-gray-900 text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Settings</button>
+                    <button onclick="setAdminTab('settings')" id="admin-tab-settings" class="px-5 py-2.5 rounded-t bg-gray-900 text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Passwords</button>
                 </div>
 
                 <!-- Admin: Daily Scores -->
@@ -359,7 +429,7 @@
                                 <input type="text" id="edit-content-title" class="w-full bg-black/80 border border-gray-700 rounded px-3 py-2 text-sm text-white">
                             </div>
                             <div class="space-y-2">
-                                <label class="text-xs font-bold text-yellow-600 uppercase">Hero Title</label>
+                                <label class="text-xs font-bold text-yellow-600 uppercase">Hero Title (Home)</label>
                                 <input type="text" id="edit-content-herotitle" class="w-full bg-black/80 border border-gray-700 rounded px-3 py-2 text-sm text-white">
                             </div>
                             <div class="space-y-2">
@@ -376,30 +446,18 @@
                             </div>
                         </div>
                         
-                        <h4 class="font-bold text-sm text-gray-300 mt-6 border-t border-yellow-600/30 pt-4 font-epic">Statistics Display (Home)</h4>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div>
-                                <label class="text-[10px] text-gray-400 uppercase">Box 1 (Val / Lbl)</label>
-                                <input type="text" id="edit-stat1-val" class="w-full bg-black/80 border border-gray-700 rounded px-2 py-1 text-xs text-white mb-1">
-                                <input type="text" id="edit-stat1-lbl" class="w-full bg-black/80 border border-gray-700 rounded px-2 py-1 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-400 uppercase">Box 2 (Val / Lbl)</label>
-                                <input type="text" id="edit-stat2-val" class="w-full bg-black/80 border border-gray-700 rounded px-2 py-1 text-xs text-white mb-1">
-                                <input type="text" id="edit-stat2-lbl" class="w-full bg-black/80 border border-gray-700 rounded px-2 py-1 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-400 uppercase">Box 3 (Val / Lbl)</label>
-                                <input type="text" id="edit-stat3-val" class="w-full bg-black/80 border border-gray-700 rounded px-2 py-1 text-xs text-white mb-1">
-                                <input type="text" id="edit-stat3-lbl" class="w-full bg-black/80 border border-gray-700 rounded px-2 py-1 text-xs text-white">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-400 uppercase">Box 4 (Val / Lbl)</label>
-                                <input type="text" id="edit-stat4-val" class="w-full bg-black/80 border border-gray-700 rounded px-2 py-1 text-xs text-white mb-1">
-                                <input type="text" id="edit-stat4-lbl" class="w-full bg-black/80 border border-gray-700 rounded px-2 py-1 text-xs text-white">
-                            </div>
+                        <!-- Dynamic Stats Config -->
+                        <h4 class="font-bold text-sm text-gray-300 mt-6 border-t border-yellow-600/30 pt-4 font-epic">Statistics Display (Home Page)</h4>
+                        <p class="text-[10px] text-gray-400 mb-2">Tambah atau kurangi jumlah kotak statistik yang muncul di halaman utama.</p>
+                        
+                        <div id="admin-stats-list" class="space-y-2 mt-2">
+                            <!-- Injected via JS -->
                         </div>
-                        <button onclick="saveSiteContent()" class="w-full epic-btn font-bold rounded py-3 mt-6 shadow-lg tracking-widest uppercase">Save Changes</button>
+                        <button onclick="window.addStatBox()" class="mt-3 bg-yellow-600/20 border border-yellow-600 text-yellow-500 px-4 py-2 rounded text-xs font-bold uppercase tracking-widest hover:bg-yellow-600/40 transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Add Statistic Box
+                        </button>
+                        
+                        <button onclick="window.saveSiteContent()" class="w-full epic-btn font-bold rounded py-3 mt-6 shadow-lg tracking-widest uppercase">Save Changes</button>
                     </div>
                 </div>
 
@@ -423,7 +481,7 @@
         </section>
     </main>
 
-    <!-- Admin Login -->
+    <!-- Modals -->
     <div id="modal-admin" class="modal-overlay" onclick="closeModal('modal-admin')">
         <div class="modal-content epic-panel p-8 rounded border-t-4 border-t-red-600 w-80 relative shadow-2xl" onclick="event.stopPropagation()">
             <button onclick="closeModal('modal-admin')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"><i class="fa-solid fa-times text-xl"></i></button>
@@ -440,24 +498,20 @@
         </div>
     </div>
 
-    <!-- Admin Edit Score Modal -->
     <div id="modal-edit-score" class="modal-overlay" onclick="closeModal('modal-edit-score')">
         <div class="modal-content epic-panel p-6 rounded border-t-4 border-t-yellow-500 w-80 relative text-center" onclick="event.stopPropagation()">
             <button onclick="closeModal('modal-edit-score')" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
             <h3 class="font-epic text-xl font-bold mb-1 text-yellow-500 glow-text-gold">Update Score</h3>
             <p class="text-xs text-gray-300 mb-6" id="edit-score-desc">Player Name - Tgl X</p>
-            
             <input type="hidden" id="edit-score-pid">
             <input type="hidden" id="edit-score-date">
-            
             <select id="edit-score-val" class="w-full bg-black/80 border border-yellow-600/50 text-white text-center font-bold text-xl py-3 rounded mb-6 outline-none focus:border-yellow-400">
-                <!-- Injected via JS 0 to 50 -->
+                <!-- Injected via JS -->
             </select>
             <button onclick="saveDailyScore()" class="w-full epic-btn font-bold py-3 rounded transition shadow-lg uppercase tracking-widest">SAVE STARS</button>
         </div>
     </div>
 
-    <!-- Player Profile Modal -->
     <div id="modal-profile" class="modal-overlay" onclick="closeModal('modal-profile')">
         <div class="modal-content epic-panel p-6 rounded w-full max-w-sm relative text-center border-t-4 border-t-yellow-500" onclick="event.stopPropagation()">
             <button onclick="closeModal('modal-profile')" class="absolute top-4 right-4 text-gray-400 hover:text-white z-10"><i class="fa-solid fa-times text-xl"></i></button>
@@ -467,7 +521,6 @@
         </div>
     </div>
 
-    <!-- Team (Guild) Detail Modal -->
     <div id="modal-guild" class="modal-overlay" onclick="closeModal('modal-guild')">
         <div class="modal-content epic-panel p-6 rounded w-[90%] max-w-md relative text-center border-t-4 border-t-purple-500" onclick="event.stopPropagation()">
             <button onclick="closeModal('modal-guild')" class="absolute top-4 right-4 text-gray-400 hover:text-white z-10"><i class="fa-solid fa-times text-xl"></i></button>
@@ -477,22 +530,23 @@
         </div>
     </div>
 
-    <!-- Generic Message / Capture Modal -->
     <div id="modal-message" class="modal-overlay" onclick="closeModal('modal-message')">
-        <div class="modal-content epic-panel p-6 rounded w-[90%] max-w-sm text-center border-t-4 border-blue-500" onclick="event.stopPropagation()">
-            <button onclick="closeModal('modal-message')" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
+        <div class="modal-content epic-panel p-6 rounded w-[90%] max-w-lg text-center border-t-4 border-blue-500" onclick="event.stopPropagation()">
+            <button onclick="closeModal('modal-message')" class="absolute top-4 right-4 text-gray-400 hover:text-white z-20"><i class="fa-solid fa-times"></i></button>
             <h3 class="font-epic text-xl font-bold mb-3 text-blue-400 drop-shadow-md" id="modal-message-title">System Notice</h3>
             <div class="text-sm text-gray-300 mb-6" id="modal-message-text">Message</div>
+            
             <div id="modal-capture-area" class="hidden flex flex-col items-center">
-                <img id="capture-img-preview" class="w-full border border-gray-700 rounded mb-4 shadow-lg" src="" alt="Map Capture">
-                <a id="capture-download-btn" href="#" download="MoraRepublic_Map.png" class="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-3 rounded transition shadow-lg block text-center mb-3 uppercase tracking-widest"><i class="fa-solid fa-download mr-2"></i> Save to Gallery</a>
+                <div class="max-h-[60vh] overflow-y-auto border border-gray-700 rounded mb-4 shadow-lg w-full">
+                    <img id="capture-img-preview" class="w-full h-auto block" src="" alt="Report Capture">
+                </div>
+                <a id="capture-download-btn" href="#" download="MoraRepublic_Report.png" class="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-3 rounded transition shadow-lg block text-center mb-3 uppercase tracking-widest"><i class="fa-solid fa-download mr-2"></i> Save Report Poster</a>
                 <p class="text-[10px] text-gray-400 italic">*If button fails, long-press the image and select "Save Image".</p>
             </div>
             <button onclick="closeModal('modal-message')" id="modal-msg-ok-btn" class="w-full epic-btn font-bold py-3 rounded transition uppercase tracking-widest">ACKNOWLEDGE</button>
         </div>
     </div>
 
-    <!-- Milestone Detail Modal (Shows Rewards & Players) -->
     <div id="modal-milestone" class="modal-overlay" onclick="closeModal('modal-milestone')">
         <div class="modal-content epic-panel p-6 rounded w-[90%] max-w-sm relative text-center border-t-4 border-t-yellow-500" onclick="event.stopPropagation()">
             <button onclick="closeModal('modal-milestone')" class="absolute top-4 right-4 text-gray-400 hover:text-white z-10"><i class="fa-solid fa-times text-xl"></i></button>
@@ -502,106 +556,12 @@
         </div>
     </div>
 
-    <script>
-        // Register Global Functions immediately
-        window.switchTab = function(tabId) {
-            window.activeTab = tabId;
-            ['home', 'map', 'leaderboard', 'admin-dashboard'].forEach(t => {
-                const el = document.getElementById(`sec-${t}`);
-                if(el) el.classList.add('hidden');
-                
-                const btn = document.getElementById(`tab-${t}`);
-                if(btn) btn.classList.remove('active');
-            });
-            
-            const targetEl = document.getElementById(`sec-${tabId}`);
-            if(targetEl) targetEl.classList.remove('hidden');
-            
-            const targetBtn = document.getElementById(`tab-${tabId}`);
-            if(targetBtn) targetBtn.classList.add('active');
-
-            if(tabId === 'map') {
-                setTimeout(() => {
-                    const mapContainer = document.getElementById('map-container');
-                    if(mapContainer) mapContainer.scrollTo({ top: mapContainer.scrollHeight, behavior: 'smooth' });
-                }, 100);
-            }
-            if(typeof window.renderAll === 'function') {
-                window.renderAll();
-            }
-        };
-
-        window.closeModal = function(id) {
-            const el = document.getElementById(id);
-            if(el) el.classList.remove('active');
-        };
-
-        window.showMessage = function(title, text) {
-            document.getElementById('modal-message-title').innerText = title;
-            document.getElementById('modal-message-text').innerText = text;
-            document.getElementById('modal-capture-area').classList.add('hidden');
-            document.getElementById('modal-msg-ok-btn').classList.remove('hidden');
-            document.getElementById('modal-message').classList.add('active');
-        };
-
-        window.setLbTab = function(tab) {
-            window.activeLbTab = tab;
-            const btnP = document.getElementById('btn-lb-players');
-            const btnG = document.getElementById('btn-lb-guilds');
-            
-            if(tab === 'players') {
-                btnP.className = 'epic-btn px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase';
-                btnG.className = 'bg-black/80 border border-yellow-600/30 text-gray-400 hover:text-yellow-500 px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase transition';
-            } else {
-                btnG.className = 'epic-btn px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase';
-                btnP.className = 'bg-black/80 border border-yellow-600/30 text-gray-400 hover:text-yellow-500 px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase transition';
-            }
-            if(typeof window.renderLeaderboard === 'function') window.renderLeaderboard();
-        };
-
-        window.setAdminTab = function(tab) {
-            ['players', 'players-edit', 'guilds', 'rewards', 'content', 'settings'].forEach(t => {
-                const pane = document.getElementById(`admin-pane-${t}`);
-                if(pane) pane.classList.add('hidden');
-                
-                const btn = document.getElementById(`admin-tab-${t}`);
-                if(btn) {
-                    btn.classList.remove('bg-yellow-600', 'text-black');
-                    btn.classList.add('bg-gray-900', 'text-gray-400');
-                }
-            });
-            const targetPane = document.getElementById(`admin-pane-${tab}`);
-            if(targetPane) targetPane.classList.remove('hidden');
-            
-            const targetBtn = document.getElementById(`admin-tab-${tab}`);
-            if(targetBtn) {
-                targetBtn.classList.remove('bg-gray-900', 'text-gray-400');
-                targetBtn.classList.add('bg-yellow-600', 'text-black');
-            }
-        };
-
-        // File to Base64 utility
-        window.handleImageUpload = function(inputEl, callback) {
-            if(!inputEl || !inputEl.files || !inputEl.files[0]) {
-                callback(null);
-                return;
-            }
-            const file = inputEl.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                callback(e.target.result); // Base64 string
-            };
-            reader.readAsDataURL(file);
-        };
-    </script>
-
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
-        // Konfigurasi Firebase Milik Anda
         const firebaseConfig = {
             apiKey: "AIzaSyAilWL4oYoI3B2SUetb9BpjUp_n6pOquc0",
             authDomain: "mora-republic-db.firebaseapp.com",
@@ -617,7 +577,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Path penyimpanan terstruktur (Bisa digunakan di Github Pages)
+        // Path rules mapping as requested
         const appId = 'mora_republic_main';
         const getDocRef = (col, id) => doc(db, 'artifacts', appId, 'public', 'data', col, id);
         const getColRef = (col) => collection(db, 'artifacts', appId, 'public', 'data', col);
@@ -640,10 +600,12 @@
             mapDesc: "Reach 30 stars to unlock IMMORTAL.",
             heroTitle: "WELCOME TO THE REALM",
             heroSub: "Establish your legacy.",
-            stat1Val: "20", stat1Lbl: "PLAYERS",
-            stat2Val: "30", stat2Lbl: "MILESTONES",
-            stat3Val: "7", stat3Lbl: "RANKS",
-            stat4Val: "∞", stat4Lbl: "REWARDS"
+            stats: [
+                { val: "20", lbl: "PLAYERS" },
+                { val: "30", lbl: "MILESTONES" },
+                { val: "7", lbl: "RANKS" },
+                { val: "∞", lbl: "REWARDS" }
+            ]
         };
 
         const rankSystem = [
@@ -706,10 +668,21 @@
             safeSet('hero-title', window.siteContent.heroTitle);
             safeSet('hero-subtitle', window.siteContent.heroSub);
             
-            safeSet('stat-players-val', window.siteContent.stat1Val); safeSet('stat-players-lbl', window.siteContent.stat1Lbl);
-            safeSet('stat-milestones-val', window.siteContent.stat2Val); safeSet('stat-milestones-lbl', window.siteContent.stat2Lbl);
-            safeSet('stat-ranks-val', window.siteContent.stat3Val); safeSet('stat-ranks-lbl', window.siteContent.stat3Lbl);
-            safeSet('stat-comp-val', window.siteContent.stat4Val); safeSet('stat-comp-lbl', window.siteContent.stat4Lbl);
+            const statsContainer = document.getElementById('home-stats-container');
+            if (statsContainer && window.siteContent.stats) {
+                let cols = window.siteContent.stats.length;
+                if(cols === 0) cols = 1;
+                let mdCols = cols > 4 ? 4 : cols; 
+                
+                statsContainer.className = `grid grid-cols-2 md:grid-cols-${mdCols} gap-4 max-w-5xl mx-auto`;
+                statsContainer.innerHTML = window.siteContent.stats.map(s => `
+                    <div class="epic-panel p-6 rounded text-center border-t-4 border-t-yellow-500 relative overflow-hidden group shadow-lg">
+                        <div class="absolute inset-0 bg-yellow-500/10 opacity-0 group-hover:opacity-100 transition"></div>
+                        <div class="text-4xl md:text-5xl font-epic font-bold text-white mb-2 drop-shadow-lg">${s.val}</div>
+                        <div class="text-[10px] md:text-xs text-yellow-600 font-bold tracking-widest uppercase font-epic">${s.lbl}</div>
+                    </div>
+                `).join('');
+            }
         };
 
         window.renderMap = function() {
@@ -717,6 +690,9 @@
             if(!mapEl) return;
             mapEl.innerHTML = '';
             const offsetPattern = [0, 50, 0, -50];
+            
+            // Penyesuaian kordinat render text rank
+            const targetStars = { 2: 'payah', 7: 'epic', 12: 'legend', 16: 'mythic', 21: 'honor', 26: 'glory' };
 
             for (let star = 30; star >= 0; star--) {
                 const isMax = star === 30;
@@ -728,26 +704,48 @@
                 const rewardInfo = window.rewardsData.find(r => r.star === star);
                 
                 let displayReward = "";
-                if(rewardInfo && (rewardInfo.name || rewardInfo.name2)) {
-                    displayReward = `<i class="fa-solid fa-gift mr-1 text-[8px]"></i> Reward Available`;
+                if(rewardInfo) {
+                    let rewardsList = [];
+                    if(rewardInfo.name) rewardsList.push(rewardInfo.name);
+                    if(rewardInfo.name2) rewardsList.push(rewardInfo.name2);
+                    if(rewardsList.length > 0) {
+                        displayReward = `<i class="fa-solid fa-gift mr-1 text-[8px] text-yellow-400"></i>${rewardsList.join(' + ')}`;
+                    }
                 }
                 
-                const isRankBoundary = (star === rank.min);
                 const rankIndex = rankSystem.findIndex(r => r.id === rank.id);
                 const isRightSide = (rankIndex % 2 === 0);
                 const offsetX = offsetPattern[star % 4];
+
+                let textOverlay = '';
+                
+                if (isMax) {
+                    textOverlay = `
+                        <div class="absolute -top-32 md:-top-40 left-1/2 -translate-x-1/2 z-0 pointer-events-none flex flex-col items-center">
+                            <div class="w-[3px] h-16 md:h-24 bg-gradient-to-t from-blue-400 via-yellow-400 to-orange-500 shadow-[0_0_15px_#ffcc00] mb-2"></div>
+                            
+                            <div class="relative flex items-center justify-center">
+                                <!-- Matahari di tengah text absolutes -->
+                                <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 md:w-56 md:h-56 bg-gradient-to-tr from-orange-600 via-yellow-400 to-yellow-200 rounded-full blur-[40px] opacity-90 animate-pulse"></div>
+                                
+                                <span class="relative font-epic font-black text-5xl md:text-7xl text-white tracking-[0.2em] uppercase z-10 whitespace-nowrap" style="text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff6600, 0 0 40px #ff0000, 2px 2px 5px #000;">
+                                    IMMORTAL
+                                </span>
+                            </div>
+                        </div>`;
+                } 
+                else if (targetStars[star]) {
+                    textOverlay = `<div class="absolute ${isRightSide ? 'right-4 md:right-16' : 'left-4 md:left-16'} top-1/2 -translate-y-1/2 z-0 pointer-events-none">
+                        <span class="${isRightSide ? 'vertical-text-right' : 'vertical-text-left'} font-epic font-black text-6xl md:text-[5.5rem] ${rank.colorClass} opacity-30 tracking-widest drop-shadow-[0_0_20px_currentColor]">${rank.name}</span>
+                    </div>`;
+                }
 
                 const nodeContainer = document.createElement('div');
                 nodeContainer.className = "relative w-full flex items-center justify-center";
                 const tagTextSize = playersHere.length > 4 ? 'text-[8px] px-1 py-0.5' : 'text-[10px] md:text-xs px-2 py-1';
 
                 nodeContainer.innerHTML = `
-                    ${isRankBoundary ? `
-                        <div class="absolute ${isRightSide ? 'right-2 md:right-8' : 'left-2 md:left-8'} bottom-1/2 translate-y-1/2 z-0 pointer-events-none">
-                            <span class="${isRightSide ? 'vertical-text-right' : 'vertical-text-left'} font-epic font-black text-4xl md:text-6xl ${rank.colorClass} opacity-30 drop-shadow-[0_0_20px_currentColor]">${rank.name}</span>
-                        </div>
-                    ` : ''}
-
+                    ${textOverlay}
                     <div class="w-full flex flex-col items-center justify-center relative z-10 transition-transform duration-300 hover:z-30" style="transform: translateX(${offsetX}px);">
                         ${playersHere.length > 0 ? `
                             <div class="flex flex-wrap justify-center gap-1 mb-2 max-w-[150px] md:max-w-[200px]">
@@ -764,8 +762,8 @@
                             ${displayReward ? `<div class="absolute -bottom-2 -right-2 bg-yellow-600 text-black w-6 h-6 rounded-full flex items-center justify-center border border-black shadow-lg text-xs"><i class="fa-solid fa-gift"></i></div>` : ''}
                         </div>
 
-                        <div class="mt-2 text-center h-4 flex items-center justify-center z-20">
-                            ${displayReward ? `<span class="text-[9px] md:text-[10px] font-bold text-yellow-500 bg-black/90 px-2 py-0.5 rounded border border-yellow-700 shadow-[0_0_10px_rgba(212,175,55,0.2)] uppercase tracking-widest cursor-pointer" onclick="window.showMilestoneDetail(${star})">${displayReward}</span>` : ''}
+                        <div class="mt-2 text-center flex items-center justify-center z-20 h-5">
+                            ${displayReward ? `<span class="text-[9px] md:text-[10px] font-bold text-yellow-400 bg-black/95 px-2.5 py-1 rounded-full border border-yellow-500/60 shadow-[0_0_12px_rgba(212,175,55,0.3)] uppercase tracking-wider cursor-pointer max-w-[220px] truncate" onclick="window.showMilestoneDetail(${star})">${displayReward}</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -996,7 +994,9 @@
 
             const rList = document.getElementById('admin-rewards-list');
             if(rList) {
-                rList.innerHTML = window.rewardsData.map(r => `
+                const sortedRewards = [...window.rewardsData].sort((a, b) => a.star - b.star);
+                
+                rList.innerHTML = sortedRewards.map(r => `
                     <div class="bg-black/60 border border-gray-700 p-3 rounded flex flex-col gap-3 mb-2">
                         <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                             <div class="font-epic font-bold text-yellow-500 text-sm md:text-base">⭐ STAR ${r.star}</div>
@@ -1028,16 +1028,34 @@
                 `).join('');
             }
 
+            // Render Editor Dynamic Stats 
+            const adminStatsList = document.getElementById('admin-stats-list');
+            if (adminStatsList && window.siteContent.stats) {
+                adminStatsList.innerHTML = window.siteContent.stats.map((s, i) => `
+                    <div class="admin-stat-item flex items-center gap-2 bg-black/80 border border-gray-700 p-2 rounded">
+                        <input type="text" id="edit-stat-val-${i}" value="${s.val}" placeholder="Value" class="w-1/3 bg-black/90 border border-gray-600 rounded px-2 py-1 text-xs text-white outline-none focus:border-yellow-500">
+                        <input type="text" id="edit-stat-lbl-${i}" value="${s.lbl}" placeholder="Label" class="w-2/3 bg-black/90 border border-gray-600 rounded px-2 py-1 text-xs text-white outline-none focus:border-yellow-500 uppercase">
+                        <button onclick="window.removeStatBox(${i})" class="text-red-500 hover:text-red-400 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `).join('');
+            }
+
             const safeSetVal = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
             safeSetVal('edit-content-title', window.siteContent.title);
             safeSetVal('edit-content-maptitle', window.siteContent.mapTitle);
             safeSetVal('edit-content-mapdesc', window.siteContent.mapDesc);
             safeSetVal('edit-content-herotitle', window.siteContent.heroTitle);
             safeSetVal('edit-content-herosub', window.siteContent.heroSub);
-            safeSetVal('edit-stat1-val', window.siteContent.stat1Val); safeSetVal('edit-stat1-lbl', window.siteContent.stat1Lbl);
-            safeSetVal('edit-stat2-val', window.siteContent.stat2Val); safeSetVal('edit-stat2-lbl', window.siteContent.stat2Lbl);
-            safeSetVal('edit-stat3-val', window.siteContent.stat3Val); safeSetVal('edit-stat3-lbl', window.siteContent.stat3Lbl);
-            safeSetVal('edit-stat4-val', window.siteContent.stat4Val); safeSetVal('edit-stat4-lbl', window.siteContent.stat4Lbl);
+        };
+
+        window.addStatBox = function() {
+            window.siteContent.stats.push({ val: "0", lbl: "NEW STAT" });
+            window.renderAdminPanes();
+        };
+
+        window.removeStatBox = function(idx) {
+            window.siteContent.stats.splice(idx, 1);
+            window.renderAdminPanes();
         };
 
         window.openScoreEditor = function(playerId, dateNum) {
@@ -1262,7 +1280,7 @@
                 await setDoc(getDocRef('players', newId), { id: newId, name, avatar, history: {}, guild_id: guildId });
                 
                 document.getElementById('add-player-name').value = '';
-                fileInput.value = '';
+                if(fileInput) fileInput.value = '';
                 window.showMessage("Success", "Champion summoned successfully!");
             });
         };
@@ -1287,7 +1305,7 @@
                 await setDoc(getDocRef('guilds', newId), { id: newId, name, logo, totalStars: 0 });
                 
                 document.getElementById('add-guild-name').value = '';
-                fileInput.value = '';
+                if(fileInput) fileInput.value = '';
                 window.showMessage("Success", "Team established successfully!");
             });
         };
@@ -1331,13 +1349,19 @@
 
         window.saveSiteContent = async function() {
             const safeGet = (id) => document.getElementById(id)?.value || '';
+            
+            let updatedStats = [];
+            if(window.siteContent.stats) {
+                updatedStats = window.siteContent.stats.map((s, i) => ({
+                    val: document.getElementById(`edit-stat-val-${i}`).value || '0',
+                    lbl: document.getElementById(`edit-stat-lbl-${i}`).value || 'STAT'
+                }));
+            }
+
             const newContent = {
                 title: safeGet('edit-content-title'), mapTitle: safeGet('edit-content-maptitle'), mapDesc: safeGet('edit-content-mapdesc'),
                 heroTitle: safeGet('edit-content-herotitle'), heroSub: safeGet('edit-content-herosub'),
-                stat1Val: safeGet('edit-stat1-val'), stat1Lbl: safeGet('edit-stat1-lbl'),
-                stat2Val: safeGet('edit-stat2-val'), stat2Lbl: safeGet('edit-stat2-lbl'),
-                stat3Val: safeGet('edit-stat3-val'), stat3Lbl: safeGet('edit-stat3-lbl'),
-                stat4Val: safeGet('edit-stat4-val'), stat4Lbl: safeGet('edit-stat4-lbl')
+                stats: updatedStats
             };
             await setDoc(getDocRef('config', 'main'), { siteContent: newContent }, { merge: true });
             window.showMessage("Success", "Realm content configurations saved.");
@@ -1359,29 +1383,108 @@
             }
         };
 
-        window.downloadMap = function() {
+        window.generatePoster = function() {
             const captureArea = document.getElementById('modal-capture-area');
             const imgPreview = document.getElementById('capture-img-preview');
             const downloadBtn = document.getElementById('capture-download-btn');
             
-            document.getElementById('modal-message-title').innerText = "GENERATING MAP SCROLL...";
-            document.getElementById('modal-message-text').innerText = "Please wait, scribing the map to parchment...";
+            document.getElementById('modal-message-title').innerText = "GENERATING REPORT POSTER...";
+            document.getElementById('modal-message-text').innerText = "System is creating a summary poster of Top Champions & Teams...";
             captureArea.classList.add('hidden');
             document.getElementById('modal-msg-ok-btn').classList.add('hidden');
             document.getElementById('modal-message').classList.add('active');
 
             setTimeout(() => {
-                const mapContent = document.getElementById('map-content');
-                if(!mapContent) return;
-                
-                const clone = mapContent.cloneNode(true);
                 const wrapper = document.createElement('div');
                 wrapper.style.position = 'absolute';
                 wrapper.style.top = '-9999px';
                 wrapper.style.left = '-9999px';
-                wrapper.style.width = '600px'; 
-                wrapper.style.backgroundColor = '#050508';
-                wrapper.appendChild(clone);
+                wrapper.style.width = '800px'; 
+                wrapper.style.background = 'linear-gradient(180deg, #050508 0%, #151520 100%)';
+                wrapper.style.padding = '30px';
+                wrapper.style.border = '2px solid #d4af37';
+                wrapper.style.boxShadow = 'inset 0 0 50px rgba(212,175,55,0.2)';
+                wrapper.style.fontFamily = "'Inter', sans-serif";
+
+                let html = `
+                    <div style="text-align: center; border-bottom: 2px solid rgba(212,175,55,0.5); padding-bottom: 20px; margin-bottom: 30px;">
+                        <h1 style="font-family: 'Cinzel', serif; font-size: 40px; font-weight: 900; color: #d4af37; margin: 0; text-shadow: 0 0 20px rgba(212,175,55,0.8); text-transform: uppercase;">${window.siteContent.title}</h1>
+                        <p style="font-size: 16px; color: #a0aec0; letter-spacing: 4px; text-transform: uppercase; margin: 5px 0 0 0; font-weight: bold;">RANKING REPORT - ${window.activeViewMonth}</p>
+                    </div>
+                    <div style="display: flex; gap: 30px;">
+                `;
+
+                html += `<div style="flex: 1;"><h3 style="font-family: 'Cinzel', serif; color: #d4af37; font-size: 20px; border-bottom: 1px solid #4a5568; padding-bottom: 10px; margin-bottom: 15px; text-transform: uppercase;">TOP 10 CHAMPIONS</h3>`;
+                let sortedP = [...window.playersData].sort((a, b) => window.getPlayerStars(b, window.activeViewMonth) - window.getPlayerStars(a, window.activeViewMonth)).slice(0, 10);
+                
+                sortedP.forEach((p, i) => {
+                    const stars = window.getPlayerStars(p, window.activeViewMonth);
+                    const rankInfo = window.getRankInfo(stars);
+                    const guild = window.guildsData.find(g => g.id === p.guild_id);
+                    
+                    let rankColorHex = '#d4af37';
+                    if(rankInfo.colorClass.includes('payah')) rankColorHex = '#9ca3af';
+                    if(rankInfo.colorClass.includes('epic')) rankColorHex = '#22c55e';
+                    if(rankInfo.colorClass.includes('legend')) rankColorHex = '#a855f7';
+                    if(rankInfo.colorClass.includes('mythic')) rankColorHex = '#eab308';
+                    if(rankInfo.colorClass.includes('honor')) rankColorHex = '#ec4899';
+                    if(rankInfo.colorClass.includes('glory')) rankColorHex = '#ef4444';
+                    if(rankInfo.colorClass.includes('immortal')) rankColorHex = '#60a5fa';
+
+                    html += `
+                        <div style="display: flex; align-items: center; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+                            <div style="width: 25px; font-weight: bold; color: #718096; font-family: 'Cinzel', serif;">${i+1}</div>
+                            <img src="${p.avatar}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid ${rankColorHex}; margin-right: 15px;">
+                            <div style="flex-grow: 1;">
+                                <div style="color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; font-family: 'Cinzel', serif; letter-spacing: 1px;">${p.name}</div>
+                                <div style="color: #a0aec0; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">${guild ? guild.name : 'Independent'}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: ${rankColorHex}; font-weight: bold; font-size: 16px;">${stars} ⭐</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+
+                html += `<div style="flex: 1;">
+                    <h3 style="font-family: 'Cinzel', serif; color: #d4af37; font-size: 20px; border-bottom: 1px solid #4a5568; padding-bottom: 10px; margin-bottom: 15px; text-transform: uppercase;">TOP TEAMS</h3>
+                `;
+                let sortedG = [...window.guildsData].sort((a, b) => (b.totalStars || 0) - (a.totalStars || 0)).slice(0, 5);
+                
+                sortedG.forEach((g, i) => {
+                    const logoImg = g.logo || `https://placehold.co/100x100/1a1a2e/d4af37?text=${g.name.charAt(0)}`;
+                    html += `
+                        <div style="display: flex; align-items: center; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+                            <div style="width: 25px; font-weight: bold; color: #718096; font-family: 'Cinzel', serif;">${i+1}</div>
+                            <img src="${logoImg}" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid #d4af37; margin-right: 15px;">
+                            <div style="flex-grow: 1;">
+                                <div style="color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; font-family: 'Cinzel', serif; letter-spacing: 1px;">${g.name}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #d4af37; font-weight: bold; font-size: 16px;">${g.totalStars || 0} ⭐</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                    <div style="margin-top: 40px; background: rgba(212,175,55,0.05); border: 1px solid rgba(212,175,55,0.5); border-radius: 8px; padding: 20px; text-align: center;">
+                        <h4 style="color: #d4af37; margin: 0 0 15px 0; font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 2px;">REALM STATISTICS</h4>
+                        <div style="display: flex; justify-content: space-around;">
+                            <div>
+                                <div style="color: white; font-size: 24px; font-weight: bold; font-family: 'Cinzel', serif;">${window.playersData.length}</div>
+                                <div style="color: #a0aec0; font-size: 10px; letter-spacing: 2px; font-weight: bold;">CHAMPIONS</div>
+                            </div>
+                            <div>
+                                <div style="color: white; font-size: 24px; font-weight: bold; font-family: 'Cinzel', serif;">${window.guildsData.length}</div>
+                                <div style="color: #a0aec0; font-size: 10px; letter-spacing: 2px; font-weight: bold;">TEAMS</div>
+                            </div>
+                        </div>
+                    </div>
+                </div></div>`;
+
+                wrapper.innerHTML = html;
                 document.body.appendChild(wrapper);
 
                 html2canvas(wrapper, { backgroundColor: "#050508", scale: 2, useCORS: true, logging: false }).then(canvas => {
@@ -1389,14 +1492,15 @@
                     const imgData = canvas.toDataURL("image/png");
                     imgPreview.src = imgData;
                     downloadBtn.href = imgData;
-                    downloadBtn.download = `MoraRepublic_Map_${window.activeViewMonth}.png`;
-                    document.getElementById('modal-message-title').innerText = "SCROLL PREPARED";
-                    document.getElementById('modal-message-text').innerText = "Map captured successfully. Save it to your gallery.";
+                    downloadBtn.download = `MoraRepublic_Report_${window.activeViewMonth}.png`;
+                    
+                    document.getElementById('modal-message-title').innerText = "REPORT POSTER READY!";
+                    document.getElementById('modal-message-text').innerText = "Poster has been generated successfully. Save it to your gallery to share with others.";
                     captureArea.classList.remove('hidden');
                 }).catch(err => {
                     document.body.removeChild(wrapper);
                     document.getElementById('modal-message-title').innerText = "SCRIBE ERROR";
-                    document.getElementById('modal-message-text').innerText = "Failed to capture the map. Please try again.";
+                    document.getElementById('modal-message-text').innerText = "Failed to capture the poster. Please try again.";
                     document.getElementById('modal-msg-ok-btn').classList.remove('hidden');
                 });
             }, 500);
@@ -1405,23 +1509,18 @@
         document.getElementById('loading-screen').classList.remove('hidden');
 
         signInAnonymously(auth).then(() => {
-            // Dengarkan perubahan pada koleksi Players
             onSnapshot(getColRef('players'), (snap) => {
                 window.playersData = snap.docs.map(doc => doc.data());
                 window.renderAll();
             }, (err) => console.error(err));
 
-            // Dengarkan perubahan pada koleksi Guilds
             onSnapshot(getColRef('guilds'), (snap) => {
                 window.guildsData = snap.docs.map(doc => doc.data());
                 window.renderAll();
             }, (err) => console.error(err));
 
-            // Dengarkan perubahan pada koleksi Rewards
             onSnapshot(getColRef('rewards'), (snap) => {
                 window.rewardsData = snap.docs.map(doc => doc.data());
-                
-                // Jika database belum memiliki data Rewards (baru dibuat), kita injeksikan default.
                 if(snap.empty) {
                     for(let i=0; i<=30; i++) {
                         setDoc(getDocRef('rewards', i.toString()), {
@@ -1436,14 +1535,22 @@
                 window.renderAll();
             }, (err) => console.error(err));
 
-            // Dengarkan perubahan pada setting website
             onSnapshot(getDocRef('config', 'main'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    if(data.siteContent) window.siteContent = data.siteContent;
+                    if (data.siteContent) {
+                        window.siteContent = data.siteContent;
+                        if (!window.siteContent.stats) {
+                            window.siteContent.stats = [
+                                { val: window.siteContent.stat1Val || "20", lbl: window.siteContent.stat1Lbl || "PLAYERS" },
+                                { val: window.siteContent.stat2Val || "30", lbl: window.siteContent.stat2Lbl || "MILESTONES" },
+                                { val: window.siteContent.stat3Val || "7", lbl: window.siteContent.stat3Lbl || "RANKS" },
+                                { val: window.siteContent.stat4Val || "∞", lbl: window.siteContent.stat4Lbl || "REWARDS" }
+                            ].filter(s => s.lbl !== ""); 
+                        }
+                    }
                     if(data.validPins) window.validPins = data.validPins;
                 } else {
-                    // Simpan setelan awal
                     setDoc(getDocRef('config', 'main'), {
                         siteContent: window.siteContent,
                         validPins: window.validPins
@@ -1455,7 +1562,7 @@
 
         }).catch(err => {
             console.error("Firebase Connection Error:", err);
-            window.showMessage("Database Error", "Gagal terhubung ke Database. Coba refresh halaman.");
+            window.showMessage("Database Error", "Failed to connect to Database. Please refresh the page.");
             document.getElementById('loading-screen').classList.add('hidden');
         });
     </script>
