@@ -526,7 +526,7 @@
                     if(mapContainer) mapContainer.scrollTo({ top: mapContainer.scrollHeight, behavior: 'smooth' });
                 }, 100);
             }
-            if(tabId !== 'admin-dashboard' && typeof window.renderAll === 'function') {
+            if(typeof window.renderAll === 'function') {
                 window.renderAll();
             }
         };
@@ -651,8 +651,8 @@
             { id: 'epic', name: 'EPIC', min: 6, max: 10, colorClass: 'rank-epic', bgClass: 'bg-epic' },
             { id: 'legend', name: 'LEGEND', min: 11, max: 14, colorClass: 'rank-legend', bgClass: 'bg-legend' },
             { id: 'mythic', name: 'MYTHIC', min: 15, max: 19, colorClass: 'rank-mythic', bgClass: 'bg-mythic' },
-            { id: 'honor', name: 'MYTHICAL HONOR', min: 20, max: 24, colorClass: 'rank-honor', bgClass: 'bg-honor' },
-            { id: 'glory', name: 'MYTHICAL GLORY', min: 25, max: 29, colorClass: 'rank-glory', bgClass: 'bg-glory' },
+            { id: 'honor', name: 'HONOR', min: 20, max: 24, colorClass: 'rank-honor', bgClass: 'bg-honor' },
+            { id: 'glory', name: 'GLORY', min: 25, max: 29, colorClass: 'rank-glory', bgClass: 'bg-glory' },
             { id: 'immortal', name: 'IMMORTAL', min: 30, max: 999, colorClass: 'rank-immortal', bgClass: 'bg-immortal' }
         ];
 
@@ -743,8 +743,8 @@
 
                 nodeContainer.innerHTML = `
                     ${isRankBoundary ? `
-                        <div class="absolute ${isRightSide ? 'right-2 md:right-8' : 'left-2 md:left-8'} top-1/2 -translate-y-1/2 z-0 pointer-events-none">
-                            <span class="${isRightSide ? 'vertical-text-right' : 'vertical-text-left'} font-epic font-black text-5xl md:text-7xl ${rank.colorClass} opacity-30 drop-shadow-[0_0_20px_currentColor]">${rank.name}</span>
+                        <div class="absolute ${isRightSide ? 'right-2 md:right-8' : 'left-2 md:left-8'} bottom-1/2 translate-y-1/2 z-0 pointer-events-none">
+                            <span class="${isRightSide ? 'vertical-text-right' : 'vertical-text-left'} font-epic font-black text-4xl md:text-6xl ${rank.colorClass} opacity-30 drop-shadow-[0_0_20px_currentColor]">${rank.name}</span>
                         </div>
                     ` : ''}
 
