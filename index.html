@@ -277,7 +277,7 @@
         <!-- Loading Screen -->
         <div id="loading-screen" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#0a0b10] transition-opacity duration-500 hidden">
             <div class="w-16 h-16 border-4 border-gray-700 border-t-yellow-500 rounded-full animate-spin mb-4"></div>
-            <h2 id="loading-text" class="font-epic text-2xl md:text-3xl font-bold text-yellow-500 animate-pulse tracking-widest">LOADING REALM</h2>
+            <h2 id="loading-text" class="font-epic text-2xl md:text-3xl font-bold text-yellow-500 animate-pulse tracking-widest">JADILAH AE TERBAIK!!!</h2>
         </div>
 
         <section id="sec-home" class="h-full overflow-y-auto p-6 md:p-12 pb-20 absolute w-full block">
@@ -573,7 +573,7 @@
             mapDesc: "Reach 30 stars to unlock IMMORTAL.",
             heroTitle: "WELCOME TO RUNE REALMS",
             heroSub: "Join realm and clan wars for amazing rewards and establish your legacy.",
-            loadingText: "LOADING REALM",
+            loadingText: "JADILAH AE TERBAIK!!!",
             topChampionsTitle: "TOP CHAMPIONS",
             topTeamsTitle: "TOP TEAMS",
             stats: [
@@ -991,12 +991,12 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-1">
-                                <label class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Main Reward</label>
+                                <label class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">INSENTIF SA</label>
                                 <input type="text" id="rew-name-${r.star}" value="${r.name || ''}" placeholder="E.g. Rp 50.000" class="w-full bg-black border border-gray-700 rounded px-2 py-1 text-xs text-white">
                                 <input type="text" id="rew-desc-${r.star}" value="${r.desc || ''}" placeholder="Description" class="w-full bg-black border border-gray-700 rounded px-2 py-1 text-xs text-gray-400">
                             </div>
                             <div class="space-y-1">
-                                <label class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Extra Reward</label>
+                                <label class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">INSENTIF UPRESS</label>
                                 <input type="text" id="rew-name2-${r.star}" value="${r.name2 || ''}" placeholder="E.g. Item Code" class="w-full bg-black border border-gray-700 rounded px-2 py-1 text-xs text-white">
                                 <input type="text" id="rew-desc2-${r.star}" value="${r.desc2 || ''}" placeholder="Description" class="w-full bg-black border border-gray-700 rounded px-2 py-1 text-xs text-gray-400">
                             </div>
@@ -1051,21 +1051,33 @@
             
             const isLocked = pStars >= 1 && pStars <= 5;
 
+            let extraMessage = '';
+            if (pStars >= 12 && pStars < 20) {
+                extraMessage = `<div class="text-[10px] text-blue-400 mt-2 font-bold uppercase tracking-widest bg-blue-900/20 p-2 rounded border border-blue-800/50">Kejar level 12 ini tiap bulanya dan dapatkan Insentif UPRES 3 bulanan.</div>`;
+            } else if (pStars >= 20) {
+                extraMessage = `<div class="text-[10px] text-green-400 mt-2 font-bold uppercase tracking-widest bg-green-900/20 p-2 rounded border border-green-800/50">Pasti dapat Insentif UPRES 3 bulanan.</div>`;
+            }
+
             if (exactReward && (exactReward.name || exactReward.name2)) {
+                let rewardDetails = '';
+                if (exactReward.name) rewardDetails += `<div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-2">INSENTIF SA</div><div class="text-sm font-bold ${isLocked ? 'text-gray-500' : 'text-yellow-400'}">${isLocked ? '<i class="fa-solid fa-lock mr-1"></i> ' : ''}${exactReward.name}</div>`;
+                if (exactReward.name2) rewardDetails += `<div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-2">INSENTIF UPRESS</div><div class="text-xs font-bold ${isLocked ? 'text-gray-500' : 'text-gray-300'}">${isLocked ? '<i class="fa-solid fa-lock mr-1"></i> ' : ''}${exactReward.name2}</div>`;
+
                 if (isLocked) {
                     rewardHtml = `
                         <div class="mt-4 bg-[#131720] border border-gray-800 rounded p-3 text-left">
-                            <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">REWARD STATUS (STAR ${pStars})</div>
-                            <div class="text-sm font-bold text-red-500"><i class="fa-solid fa-lock mr-2"></i>LOCKED</div>
-                            <div class="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-widest">Unlocks at Star 6</div>
+                            <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 border-b border-gray-800 pb-1">REWARD STATUS (STAR ${pStars})</div>
+                            ${rewardDetails}
+                            <div class="text-[10px] text-red-400 mt-3 uppercase font-bold tracking-widest bg-red-900/20 p-2 rounded border border-red-800/50 text-center">Terkunci! Kejar Star 6 agar hadiah bisa diklaim.</div>
+                            ${extraMessage}
                         </div>
                     `;
                 } else {
                     rewardHtml = `
                         <div class="mt-4 bg-[#131720] border border-gray-800 rounded p-3 text-left">
-                            <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">CURRENT REWARD (STAR ${pStars})</div>
-                            ${exactReward.name ? `<div class="text-sm font-bold text-yellow-400"><i class="fa-solid fa-gift mr-2"></i>${exactReward.name}</div>` : ''}
-                            ${exactReward.name2 ? `<div class="text-xs font-bold text-gray-300 mt-1">${exactReward.name ? '+ ' : ''}${exactReward.name2}</div>` : ''}
+                            <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1 border-b border-gray-800 pb-1">CURRENT REWARD (STAR ${pStars})</div>
+                            ${rewardDetails}
+                            ${extraMessage}
                         </div>
                     `;
                 }
@@ -1073,6 +1085,7 @@
                  rewardHtml = `
                     <div class="mt-4 bg-[#131720] border border-gray-800 rounded p-3 text-center">
                         <div class="text-[10px] text-gray-500 italic font-epic uppercase tracking-widest">No reward at Star ${pStars}</div>
+                        ${extraMessage}
                     </div>
                 `;
             }
@@ -1162,18 +1175,22 @@
             let rewardHtml = '<div class="text-xs text-gray-600 italic mb-6 font-epic text-center">No rewards assigned.</div>';
             if(rewardInfo && (rewardInfo.name || rewardInfo.name2)) {
                 if(star >= 1 && star <= 5) {
-                    rewardHtml = `
-                        <div class="bg-[#0a0b10] border border-gray-800 rounded p-4 text-left mb-6 space-y-3">
-                            <div class="text-sm font-bold text-red-500 text-center"><i class="fa-solid fa-lock text-2xl mb-2 block"></i>LOCKED</div>
-                            <div class="text-xs text-gray-400 text-center font-bold tracking-widest uppercase">Reach Star 6 to unlock</div>
-                        </div>
-                    `;
-                } else {
-                    rewardHtml = '<div class="bg-[#0a0b10] border border-gray-800 rounded p-4 text-left mb-6 space-y-3">';
-                    if(rewardInfo.name) rewardHtml += `<div><div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">MAIN REWARD</div><div class="text-sm font-bold text-white">${rewardInfo.name}</div></div>`;
+                    rewardHtml = '<div class="bg-[#0a0b10] border border-gray-800 rounded p-4 text-left mb-6 space-y-2 opacity-80">';
+                    if(rewardInfo.name) rewardHtml += `<div><div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">INSENTIF SA</div><div class="text-sm font-bold text-gray-400"><i class="fa-solid fa-lock mr-2"></i>${rewardInfo.name}</div></div>`;
                     if(rewardInfo.name2) {
                         if(rewardInfo.name) rewardHtml += '<div class="w-full h-px bg-gray-800 my-2"></div>';
-                        rewardHtml += `<div><div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">EXTRA REWARD</div><div class="text-sm font-bold text-white">${rewardInfo.name2}</div></div>`;
+                        rewardHtml += `<div><div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">INSENTIF UPRESS</div><div class="text-sm font-bold text-gray-400"><i class="fa-solid fa-lock mr-2"></i>${rewardInfo.name2}</div></div>`;
+                    }
+                    rewardHtml += `
+                        <div class="w-full h-px bg-gray-800 my-2"></div>
+                        <div class="text-[10px] text-red-400 text-center font-bold tracking-widest uppercase bg-red-900/20 p-2 rounded">Terkunci! Kejar Star 6 agar hadiah bisa diklaim.</div>
+                    </div>`;
+                } else {
+                    rewardHtml = '<div class="bg-[#0a0b10] border border-gray-800 rounded p-4 text-left mb-6 space-y-3">';
+                    if(rewardInfo.name) rewardHtml += `<div><div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">INSENTIF SA</div><div class="text-sm font-bold text-white">${rewardInfo.name}</div></div>`;
+                    if(rewardInfo.name2) {
+                        if(rewardInfo.name) rewardHtml += '<div class="w-full h-px bg-gray-800 my-2"></div>';
+                        rewardHtml += `<div><div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">INSENTIF UPRESS</div><div class="text-sm font-bold text-white">${rewardInfo.name2}</div></div>`;
                     }
                     rewardHtml += '</div>';
                 }
