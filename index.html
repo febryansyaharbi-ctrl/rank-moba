@@ -13,10 +13,10 @@
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap');
 
         :root {
-            --bg-base: #0a0b10;
+            --bg-base: #0a0b10; 
             --bg-panel: rgba(15, 20, 28, 0.85);
-            --gold-primary: #fbbf24;
-            --gold-dark: #b45309;
+            --gold-primary: #fbbf24; 
+            --gold-dark: #b45309; 
             --text-main: #f3f4f6;
             --text-muted: #9ca3af;
             --accent-border: rgba(255, 255, 255, 0.08);
@@ -30,7 +30,12 @@
             margin: 0;
         }
 
-        #webgl-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
+        #webgl-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none;
+        }
+
         .font-epic { font-family: 'Cinzel', serif; }
         
         .epic-panel {
@@ -46,10 +51,12 @@
         }
 
         .epic-btn {
-            background-color: var(--gold-primary); color: #000 !important; font-weight: 900;
-            border: none; border-bottom: 4px solid var(--gold-dark); border-radius: 4px;
-            transition: all 0.1s ease; text-transform: uppercase; letter-spacing: 0.1em;
-            display: inline-flex; align-items: center; justify-content: center;
+            background-color: var(--gold-primary);
+            color: #000 !important;
+            font-weight: 900; border: none; border-bottom: 4px solid var(--gold-dark);
+            border-radius: 4px; transition: all 0.1s ease; text-transform: uppercase;
+            letter-spacing: 0.1em; text-shadow: none; display: inline-flex;
+            align-items: center; justify-content: center;
         }
         .epic-btn:hover { filter: brightness(1.1); transform: translateY(1px); border-bottom-width: 3px; margin-bottom: 1px; }
         .epic-btn:active { transform: translateY(4px); border-bottom-width: 0px; margin-bottom: 4px; }
@@ -57,33 +64,23 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .vertical-text-right { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); }
-        .vertical-text-left { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); }
+        .vertical-text-right { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); letter-spacing: 0.5em; }
+        .vertical-text-left { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); letter-spacing: 0.5em; }
 
-        /* 3D Sphere styling for map nodes */
-        .star-node { 
+        /* 3D Sphere Node Design */
+        .sphere-node {
             border-radius: 50%;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.6), 0 8px 15px rgba(0,0,0,0.5);
-            border: 2px solid rgba(255,255,255,0.15);
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.7), inset 5px 5px 15px rgba(255,255,255,0.2), 0 5px 15px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        .star-node:hover { transform: scale(1.15); box-shadow: inset -5px -5px 15px rgba(0,0,0,0.6), 0 0 25px currentColor; }
+        .sphere-node:hover {
+            transform: scale(1.15);
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.7), inset 5px 5px 15px rgba(255,255,255,0.4), 0 0 25px currentColor;
+        }
 
-        .rank-payah { color: #9ca3af; border-color: #9ca3af; }
-        .bg-payah { background: radial-gradient(circle at 35% 35%, #9ca3af, #374151, #111827); }
-        .rank-epic { color: #4ade80; border-color: #4ade80; }
-        .bg-epic { background: radial-gradient(circle at 35% 35%, #4ade80, #166534, #064e3b); }
-        .rank-legend { color: #c084fc; border-color: #c084fc; }
-        .bg-legend { background: radial-gradient(circle at 35% 35%, #c084fc, #6b21a8, #3b0764); }
-        .rank-mythic { color: #fbbf24; border-color: #fbbf24; }
-        .bg-mythic { background: radial-gradient(circle at 35% 35%, #fde047, #b45309, #78350f); }
-        .rank-honor { color: #f472b6; border-color: #f472b6; }
-        .bg-honor { background: radial-gradient(circle at 35% 35%, #f472b6, #be185d, #831843); }
-        .rank-glory { color: #f87171; border-color: #f87171; }
-        .bg-glory { background: radial-gradient(circle at 35% 35%, #fca5a5, #b91c1c, #7f1d1d); }
-        .rank-immortal { color: #60a5fa; border-color: #60a5fa; }
-        .bg-immortal { background: radial-gradient(circle at 35% 35%, #93c5fd, #1d4ed8, #1e3a8a); }
+        .sun-glow { text-shadow: 0 0 20px #fbbf24, 0 0 40px #fbbf24, 0 0 60px #f59e0b, 0 0 80px #b45309; }
 
+        /* Modal Layout */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(5, 5, 8, 0.9); display: flex; justify-content: center; align-items: center;
@@ -95,14 +92,36 @@
 
         .nav-btn { position: relative; padding-bottom: 4px; transition: color 0.3s ease; font-family: 'Inter', sans-serif; letter-spacing: 0.1em; }
         .nav-btn::after {
-            content: ''; position: absolute; bottom: -2px; left: 50%; width: 0; height: 2px; background: var(--gold-primary);
+            content: ''; position: absolute; bottom: -2px; left: 50%;
+            width: 0; height: 2px; background: var(--gold-primary);
             transition: all 0.3s ease; transform: translateX(-50%);
         }
         .nav-btn.active { color: var(--gold-primary); }
         .nav-btn.active::after { width: 100%; }
+
+        .rank-payah { color: #9ca3af; border-color: #9ca3af; }
+        .bg-payah { background: linear-gradient(135deg, rgba(156,163,175,0.4), rgba(156,163,175,0.1)); }
+        .rank-epic { color: #4ade80; border-color: #4ade80; }
+        .bg-epic { background: linear-gradient(135deg, rgba(74,222,128,0.4), rgba(74,222,128,0.1)); }
+        .rank-legend { color: #c084fc; border-color: #c084fc; }
+        .bg-legend { background: linear-gradient(135deg, rgba(192,132,252,0.4), rgba(192,132,252,0.1)); }
+        .rank-mythic { color: #fbbf24; border-color: #fbbf24; }
+        .bg-mythic { background: linear-gradient(135deg, rgba(251,191,36,0.4), rgba(251,191,36,0.1)); }
+        .rank-honor { color: #f472b6; border-color: #f472b6; }
+        .bg-honor { background: linear-gradient(135deg, rgba(244,114,182,0.4), rgba(244,114,182,0.1)); }
+        .rank-glory { color: #f87171; border-color: #f87171; }
+        .bg-glory { background: linear-gradient(135deg, rgba(248,113,113,0.4), rgba(248,113,113,0.1)); }
+        .rank-immortal { color: #60a5fa; border-color: #60a5fa; }
+        .bg-immortal { background: linear-gradient(135deg, rgba(96,165,250,0.6), rgba(96,165,250,0.15)); }
         
-        input[type="file"]::file-selector-button { background-color: var(--gold-primary); color: black; border: none; padding: 4px 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
-        input, select { background-color: rgba(0,0,0,0.5) !important; border-color: var(--accent-border) !important; color: white !important; }
+        input[type="file"]::file-selector-button {
+            background-color: var(--gold-primary); color: black; border: none; padding: 4px 10px; font-weight: bold; border-radius: 4px; cursor: pointer;
+        }
+        input, select {
+            background-color: rgba(0,0,0,0.5) !important;
+            border-color: var(--accent-border) !important;
+            color: white !important;
+        }
         input:focus, select:focus { border-color: var(--gold-primary) !important; }
     </style>
 </head>
@@ -111,16 +130,30 @@
     <canvas id="webgl-bg"></canvas>
 
     <script>
-        window.switchTab = function(tabId) {
+        // Mobile Back Button support
+        window.addEventListener('popstate', (event) => {
+            if (window.activeTab !== 'home') {
+                window.switchTab('home', true); // Pass true to prevent pushing another state
+            }
+        });
+
+        window.switchTab = function(tabId, fromHistory = false) {
             window.activeTab = tabId;
+            if(!fromHistory) {
+                history.pushState({tab: tabId}, '', '#' + tabId);
+            }
+            
             ['home', 'map', 'leaderboard', 'admin-dashboard'].forEach(t => {
                 const el = document.getElementById(`sec-${t}`);
                 if(el) el.classList.add('hidden');
+                
                 const btn = document.getElementById(`tab-${t}`);
                 if(btn) btn.classList.remove('active');
             });
+            
             const targetEl = document.getElementById(`sec-${tabId}`);
             if(targetEl) targetEl.classList.remove('hidden');
+            
             const targetBtn = document.getElementById(`tab-${tabId}`);
             if(targetBtn) targetBtn.classList.add('active');
 
@@ -130,10 +163,15 @@
                     if(mapContainer) mapContainer.scrollTo({ top: mapContainer.scrollHeight, behavior: 'smooth' });
                 }, 100);
             }
-            if(typeof window.renderAll === 'function') window.renderAll();
+            if(typeof window.renderAll === 'function') {
+                window.renderAll();
+            }
         };
 
-        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); };
+        window.closeModal = function(id) {
+            const el = document.getElementById(id);
+            if(el) el.classList.remove('active');
+        };
 
         window.showMessage = function(title, text) {
             document.getElementById('modal-message-title').innerText = title;
@@ -147,6 +185,7 @@
             window.activeLbTab = tab;
             const btnP = document.getElementById('btn-lb-players');
             const btnG = document.getElementById('btn-lb-guilds');
+            
             if(tab === 'players') {
                 btnP.className = 'epic-btn px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase';
                 btnG.className = 'bg-black/80 border border-gray-700 text-gray-400 hover:text-yellow-500 px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase transition';
@@ -159,31 +198,42 @@
 
         window.setAdminTab = function(tab) {
             ['players', 'players-edit', 'guilds', 'rewards', 'content', 'settings'].forEach(t => {
-                document.getElementById(`admin-pane-${t}`).classList.add('hidden');
+                const pane = document.getElementById(`admin-pane-${t}`);
+                if(pane) pane.classList.add('hidden');
+                
                 const btn = document.getElementById(`admin-tab-${t}`);
-                btn.classList.remove('bg-yellow-600', 'text-black');
-                btn.classList.add('text-gray-400');
+                if(btn) {
+                    btn.classList.remove('bg-yellow-600', 'text-black', 'border-b-2', 'border-yellow-600');
+                    btn.classList.add('text-gray-400');
+                }
             });
-            document.getElementById(`admin-pane-${tab}`).classList.remove('hidden');
+            const targetPane = document.getElementById(`admin-pane-${tab}`);
+            if(targetPane) targetPane.classList.remove('hidden');
+            
             const targetBtn = document.getElementById(`admin-tab-${tab}`);
-            targetBtn.classList.remove('text-gray-400');
-            targetBtn.classList.add('bg-yellow-600', 'text-black');
+            if(targetBtn) {
+                targetBtn.classList.remove('text-gray-400');
+                targetBtn.classList.add('bg-yellow-600', 'text-black');
+            }
         };
 
         window.handleImageUpload = function(inputEl, callback) {
-            if(!inputEl || !inputEl.files || !inputEl.files[0]) { callback(null); return; }
+            if(!inputEl || !inputEl.files || !inputEl.files[0]) {
+                callback(null); return;
+            }
+            const file = inputEl.files[0];
             const reader = new FileReader();
             reader.onload = function(e) { callback(e.target.result); };
-            reader.readAsDataURL(inputEl.files[0]);
+            reader.readAsDataURL(file);
         };
     </script>
 
-    <nav class="sticky top-0 z-50 px-4 md:px-6 py-4 flex justify-between items-center bg-[#0a0b10]/90 backdrop-blur-md border-b border-white/5">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded bg-yellow-500 flex items-center justify-center border-b-2 border-yellow-700">
+    <nav class="sticky top-0 z-50 px-6 py-4 flex justify-between items-center bg-[#0a0b10]/90 backdrop-blur-md border-b border-white/5">
+        <div class="flex items-center gap-3 cursor-pointer group" onclick="switchTab('home')">
+            <div class="w-8 h-8 rounded bg-yellow-500 flex items-center justify-center border-b-2 border-yellow-700 group-hover:scale-105 transition">
                 <i class="fa-solid fa-gem text-black text-sm"></i>
             </div>
-            <h1 class="font-epic font-bold text-lg md:text-xl tracking-widest uppercase text-yellow-500" id="nav-title">MoraRepublic</h1>
+            <h1 class="font-epic font-bold text-lg md:text-xl tracking-widest uppercase text-yellow-500 group-hover:text-yellow-400 transition" id="nav-title">MoraRepublic</h1>
         </div>
         
         <div class="hidden md:flex gap-8 font-bold text-xs tracking-widest items-center text-gray-400 uppercase">
@@ -193,11 +243,10 @@
         </div>
 
         <div class="flex gap-4 items-center">
-            <!-- Calendar with CLICK Badge -->
-            <div class="relative hidden md:flex items-center gap-2 bg-black/50 border border-gray-700 px-3 py-1.5 rounded cursor-pointer hover:border-yellow-500 transition group" onclick="document.getElementById('global-month').showPicker()">
-                <span class="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow-[0_0_8px_rgba(220,38,38,0.8)] animate-pulse">CLICK</span>
-                <i class="fa-regular fa-calendar text-gray-400 group-hover:text-yellow-500 transition text-xs"></i>
-                <input type="month" id="global-month" onchange="changeMonth()" class="bg-transparent text-xs text-gray-300 font-bold outline-none cursor-pointer border-none !bg-transparent w-28">
+            <!-- Simplified Calendar without 'CLICK' text -->
+            <div class="hidden md:flex items-center gap-2 bg-black/50 border border-gray-700 px-3 py-1.5 rounded hover:border-yellow-500 transition">
+                <i class="fa-regular fa-calendar text-yellow-500 text-xs"></i>
+                <input type="month" id="global-month" onchange="changeMonth()" class="bg-transparent text-xs text-gray-300 font-bold outline-none cursor-pointer border-none !bg-transparent w-[110px]">
             </div>
 
             <button onclick="window.generatePoster()" class="epic-btn text-xs px-4 py-2 hidden md:flex items-center gap-2">
@@ -216,9 +265,11 @@
         <button onclick="switchTab('map'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 hover:text-yellow-500 transition">JOURNEY</button>
         <button onclick="switchTab('leaderboard'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 hover:text-yellow-500 transition">RANK</button>
         <button onclick="window.generatePoster(); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 text-yellow-500 transition">CAPTURE</button>
-        <div class="w-full text-center py-2 border-t border-gray-800 flex justify-center mt-2 pt-4 relative">
-            <span class="absolute top-2 right-1/4 bg-red-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow animate-pulse">CLICK</span>
-            <input type="month" id="global-month-mobile" onchange="document.getElementById('global-month').value=this.value; changeMonth(); document.getElementById('mobile-menu').classList.add('hidden')" class="bg-black/50 border border-gray-700 text-sm text-gray-300 font-bold px-4 py-2 rounded outline-none">
+        <div class="w-full text-center py-2 border-t border-gray-800 flex justify-center mt-2 pt-4">
+            <div class="flex items-center gap-2 bg-black/50 border border-gray-700 px-3 py-1.5 rounded">
+                <i class="fa-regular fa-calendar text-yellow-500"></i>
+                <input type="month" id="global-month-mobile" onchange="document.getElementById('global-month').value=this.value; changeMonth(); document.getElementById('mobile-menu').classList.add('hidden')" class="bg-transparent text-sm text-gray-300 font-bold outline-none">
+            </div>
         </div>
     </div>
 
@@ -229,58 +280,65 @@
             <h2 id="loading-text" class="font-epic text-2xl md:text-3xl font-bold text-yellow-500 animate-pulse tracking-widest">LOADING REALM</h2>
         </div>
 
-        <section id="sec-home" class="h-full overflow-y-auto p-4 md:p-12 pb-20 absolute w-full block">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center py-6 md:py-20 relative z-10">
+        <section id="sec-home" class="h-full overflow-y-auto p-6 md:p-12 pb-20 absolute w-full block">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center py-10 md:py-20 relative z-10">
                 <div class="w-full md:w-1/2 text-left space-y-6 md:pr-10">
                     <p class="text-xs text-gray-400 tracking-[0.2em] uppercase font-bold">COMPETITIVE TRACKER</p>
-                    <h2 class="font-epic text-4xl md:text-6xl font-black text-white tracking-wide uppercase leading-tight" id="hero-title">WELCOME TO RUNE REALMS</h2>
+                    <h2 class="font-epic text-5xl md:text-6xl font-black text-white tracking-wide uppercase leading-tight" id="hero-title">WELCOME TO RUNE REALMS</h2>
                     <p class="text-sm md:text-base text-gray-300 leading-relaxed max-w-md" id="hero-subtitle">Join realm and clan wars for amazing rewards and establish your legacy.</p>
                     
-                    <div class="pt-4 flex gap-4">
-                        <button onclick="switchTab('map')" class="epic-btn font-epic py-3 px-10 text-sm md:text-base">
+                    <div class="pt-6 flex gap-4">
+                        <button onclick="switchTab('map')" class="epic-btn font-epic py-3 px-12 text-sm md:text-base">
                             START
                         </button>
                     </div>
                 </div>
                 <div class="w-full md:w-1/2 mt-12 md:mt-0 flex justify-center relative">
-                    <div class="absolute w-72 h-72 md:w-96 md:h-96 bg-blue-500/10 rounded-full blur-[100px]"></div>
+                    <div class="absolute w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]"></div>
                 </div>
             </div>
 
-            <!-- Dynamic Stats (No icons, centered) -->
-            <div id="home-stats-container" class="mt-8 md:mt-12 relative z-10"></div>
+            <!-- Dynamic Stats Boxes -->
+            <div id="home-stats-container" class="mt-12 relative z-10">
+                <!-- Injected via JS -->
+            </div>
             
-            <div class="max-w-6xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 pb-10 relative z-10">
-                <div class="epic-panel rounded p-5 md:p-6">
+            <!-- Top Lists -->
+            <div class="max-w-6xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 pb-10 relative z-10">
+                <div class="epic-panel rounded p-6">
                     <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-3">
-                        <h3 class="font-epic text-lg md:text-xl font-bold text-white tracking-widest" id="home-champ-title">TOP CHAMPIONS</h3>
+                        <h3 id="title-champions" class="font-epic text-xl font-bold text-white tracking-widest">TOP CHAMPIONS</h3>
                         <button onclick="switchTab('leaderboard')" class="epic-btn text-[10px] px-3 py-1.5">View All</button>
                     </div>
-                    <div id="home-top-players" class="space-y-3"></div>
+                    <div id="home-top-players" class="space-y-3">
+                        <!-- Injected via JS -->
+                    </div>
                 </div>
 
-                <div class="epic-panel rounded p-5 md:p-6">
+                <div class="epic-panel rounded p-6">
                     <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-3">
-                        <h3 class="font-epic text-lg md:text-xl font-bold text-white tracking-widest" id="home-team-title">TOP TEAMS</h3>
+                        <h3 id="title-teams" class="font-epic text-xl font-bold text-white tracking-widest">TOP TEAMS</h3>
                         <button onclick="switchTab('leaderboard'); setLbTab('guilds');" class="epic-btn text-[10px] px-3 py-1.5">View All</button>
                     </div>
-                    <div id="home-top-guilds" class="space-y-3"></div>
+                    <div id="home-top-guilds" class="space-y-3">
+                        <!-- Injected via JS -->
+                    </div>
                 </div>
             </div>
         </section>
 
         <section id="sec-map" class="h-full w-full hidden absolute overflow-hidden">
-            <div class="absolute top-4 left-4 md:top-6 md:left-6 z-20 pointer-events-none">
-                <div class="epic-panel px-4 py-3 md:px-5 md:py-4 rounded border-l-4 border-yellow-500 backdrop-blur-md">
-                    <h2 class="font-epic text-sm md:text-lg font-bold text-yellow-500" id="map-title">JOURNEY MAP</h2>
-                    <p class="text-[9px] md:text-xs text-gray-400 font-bold uppercase mt-1" id="map-desc">Reach 30 stars to unlock IMMORTAL.</p>
+            <div class="absolute top-6 left-6 z-20 pointer-events-none">
+                <div class="epic-panel px-5 py-4 rounded border-l-4 border-yellow-500">
+                    <h2 class="font-epic text-base md:text-lg font-bold text-yellow-500" id="map-title">JOURNEY MAP</h2>
+                    <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase mt-1" id="map-desc">Reach 30 stars to unlock IMMORTAL.</p>
                 </div>
             </div>
 
             <div id="map-container" class="absolute inset-0 h-full w-full overflow-y-auto overflow-x-hidden hide-scrollbar scroll-smooth">
-                <div id="map-content" class="relative w-full min-h-max max-w-lg mx-auto flex flex-col items-center pt-48 pb-40">
+                <div id="map-content" class="relative w-full min-h-max max-w-lg mx-auto flex flex-col items-center pt-32 pb-40">
                     <div id="map-line" class="absolute top-0 bottom-0 w-[2px] bg-gray-800 left-1/2 -translate-x-1/2 z-0"></div>
-                    <div id="map-nodes" class="w-full flex flex-col justify-end gap-24 md:gap-32 relative z-10 pt-20">
+                    <div id="map-nodes" class="w-full flex flex-col justify-end gap-20 md:gap-28 relative z-10 pt-16 overflow-hidden md:overflow-visible">
                         <!-- Nodes injected via JS -->
                     </div>
                 </div>
@@ -288,10 +346,10 @@
         </section>
 
         <section id="sec-leaderboard" class="h-full w-full hidden absolute overflow-y-auto p-4 md:p-8 pb-20">
-            <div class="max-w-4xl mx-auto space-y-6 md:space-y-8 relative z-10 mt-4 md:mt-8">
-                <div class="flex justify-center gap-2 md:gap-4">
-                    <button id="btn-lb-players" onclick="setLbTab('players')" class="epic-btn px-6 py-2.5 text-xs md:text-sm">CHAMPIONS</button>
-                    <button id="btn-lb-guilds" onclick="setLbTab('guilds')" class="bg-gray-800 border-b-4 border-gray-900 text-gray-400 hover:text-white px-6 py-2.5 rounded font-epic font-bold text-xs md:text-sm tracking-widest uppercase transition">TEAMS</button>
+            <div class="max-w-4xl mx-auto space-y-8 relative z-10 mt-8">
+                <div class="flex justify-center gap-4">
+                    <button id="btn-lb-players" onclick="setLbTab('players')" class="epic-btn px-8 py-2.5 text-sm">CHAMPIONS</button>
+                    <button id="btn-lb-guilds" onclick="setLbTab('guilds')" class="bg-gray-800 border-b-4 border-gray-900 text-gray-400 hover:text-white px-8 py-2.5 rounded font-epic font-bold text-sm tracking-widest uppercase transition">TEAMS</button>
                 </div>
 
                 <div class="flex gap-2 relative">
@@ -307,96 +365,101 @@
 
         <section id="sec-admin-dashboard" class="h-full w-full hidden absolute overflow-y-auto p-4 pb-20">
             <div class="max-w-6xl mx-auto space-y-6 relative z-10 mt-4">
-                <div class="flex justify-between items-center epic-panel p-4 md:p-5 rounded border-t-2 border-t-red-600">
+                <div class="flex justify-between items-center epic-panel p-5 rounded border-t-2 border-t-red-600">
                     <div>
-                        <h2 class="font-epic text-lg md:text-xl font-bold text-white tracking-widest uppercase">REALM CONTROL</h2>
-                        <p class="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest mt-1">Authorized Access Only</p>
+                        <h2 class="font-epic text-xl font-bold text-white tracking-widest uppercase">REALM CONTROL</h2>
+                        <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Authorized Access Only</p>
                     </div>
                     <button onclick="logoutAdmin()" class="epic-btn !bg-red-600 !border-red-800 text-white px-4 py-2 text-xs"><i class="fa-solid fa-power-off md:mr-2"></i><span class="hidden md:inline">LOGOUT</span></button>
                 </div>
 
                 <div class="flex overflow-x-auto hide-scrollbar gap-2 pb-2 border-b border-gray-800">
-                    <button onclick="setAdminTab('players')" id="admin-tab-players" class="px-4 py-2.5 rounded-t bg-yellow-600 text-black font-bold text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap font-epic">Scores</button>
-                    <button onclick="setAdminTab('players-edit')" id="admin-tab-players-edit" class="px-4 py-2.5 rounded-t text-gray-400 hover:text-white font-bold text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Champions</button>
-                    <button onclick="setAdminTab('guilds')" id="admin-tab-guilds" class="px-4 py-2.5 rounded-t text-gray-400 hover:text-white font-bold text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Teams</button>
-                    <button onclick="setAdminTab('rewards')" id="admin-tab-rewards" class="px-4 py-2.5 rounded-t text-gray-400 hover:text-white font-bold text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Rewards</button>
-                    <button onclick="setAdminTab('content')" id="admin-tab-content" class="px-4 py-2.5 rounded-t text-gray-400 hover:text-white font-bold text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Content</button>
-                    <button onclick="setAdminTab('settings')" id="admin-tab-settings" class="px-4 py-2.5 rounded-t text-gray-400 hover:text-white font-bold text-[10px] md:text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Security</button>
+                    <button onclick="setAdminTab('players')" id="admin-tab-players" class="px-5 py-2.5 rounded-t bg-yellow-600 text-black font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic">Daily Scores</button>
+                    <button onclick="setAdminTab('players-edit')" id="admin-tab-players-edit" class="px-5 py-2.5 rounded-t text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Champions</button>
+                    <button onclick="setAdminTab('guilds')" id="admin-tab-guilds" class="px-5 py-2.5 rounded-t text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Teams</button>
+                    <button onclick="setAdminTab('rewards')" id="admin-tab-rewards" class="px-5 py-2.5 rounded-t text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Rewards</button>
+                    <button onclick="setAdminTab('content')" id="admin-tab-content" class="px-5 py-2.5 rounded-t text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Site Content</button>
+                    <button onclick="setAdminTab('settings')" id="admin-tab-settings" class="px-5 py-2.5 rounded-t text-gray-400 hover:text-white font-bold text-xs uppercase tracking-widest whitespace-nowrap font-epic transition">Passwords</button>
                 </div>
 
-                <!-- Admin Panes -->
                 <div id="admin-pane-players" class="space-y-4">
                     <div class="epic-panel p-4 rounded overflow-hidden">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-sm md:text-lg text-white font-epic">Daily Star Scores (<span id="admin-score-month-lbl" class="text-yellow-500"></span>)</h3>
+                            <h3 class="font-bold text-lg text-white font-epic">Daily Star Scores (<span id="admin-score-month-lbl" class="text-yellow-500"></span>)</h3>
+                            <p class="text-[10px] text-gray-400 italic">Click on date cells to input score.</p>
                         </div>
                         <div class="overflow-x-auto hide-scrollbar rounded">
-                            <table class="w-full text-left text-[10px] md:text-xs text-gray-300 border-collapse min-w-[800px]" id="admin-score-table"></table>
+                            <table class="w-full text-left text-[10px] md:text-xs text-gray-300 border-collapse min-w-[800px]" id="admin-score-table">
+                                <!-- Injected via JS -->
+                            </table>
                         </div>
                     </div>
                 </div>
 
                 <div id="admin-pane-players-edit" class="hidden space-y-4">
-                    <div class="epic-panel p-4 md:p-5 rounded border-t-2 border-green-500">
+                    <div class="epic-panel p-5 rounded border-t-2 border-green-500">
                         <h3 class="font-bold text-lg mb-4 text-white font-epic">Summon New Champion</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                            <div class="flex flex-col"><label class="text-[10px] text-gray-400 mb-1 uppercase tracking-widest">Name</label><input type="text" id="add-player-name" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
-                            <div class="flex flex-col"><label class="text-[10px] text-gray-400 mb-1 uppercase tracking-widest">Avatar</label><input type="file" id="add-player-file" accept="image/*" class="text-[10px] text-gray-300"></div>
-                            <div class="flex flex-col"><label class="text-[10px] text-gray-400 mb-1 uppercase tracking-widest">Team</label><select id="add-player-guild" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"><option value="">Independent</option></select></div>
-                            <button onclick="addPlayer()" class="epic-btn !bg-green-500 !border-green-700 py-2 text-xs">Summon</button>
+                            <div class="flex flex-col"><label class="text-[10px] text-gray-400 mb-1 uppercase tracking-widest">Name</label><input type="text" id="add-player-name" placeholder="Name" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
+                            <div class="flex flex-col"><label class="text-[10px] text-gray-400 mb-1 uppercase tracking-widest">Avatar Upload</label><input type="file" id="add-player-file" accept="image/*" class="text-xs text-gray-300"></div>
+                            <div class="flex flex-col">
+                                <label class="text-[10px] text-gray-400 mb-1 uppercase tracking-widest">Team</label>
+                                <select id="add-player-guild" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"><option value="">Independent</option></select>
+                            </div>
+                            <button onclick="addPlayer()" class="epic-btn !bg-green-500 !border-green-700 py-2.5 text-xs">Summon</button>
                         </div>
                     </div>
                     <div id="admin-players-list" class="space-y-3"></div>
                 </div>
 
                 <div id="admin-pane-guilds" class="hidden space-y-4">
-                    <div class="epic-panel p-4 md:p-5 rounded border-t-2 border-purple-500">
+                    <div class="epic-panel p-5 rounded border-t-2 border-purple-500">
                         <h3 class="font-bold text-lg mb-4 text-white font-epic">Found New Team</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                            <div class="flex flex-col"><label class="text-[10px] text-gray-400 mb-1 uppercase tracking-widest">Team Name</label><input type="text" id="add-guild-name" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
-                            <div class="flex flex-col"><label class="text-[10px] text-gray-400 mb-1 uppercase tracking-widest">Team Logo</label><input type="file" id="add-guild-file" accept="image/*" class="text-[10px] text-gray-300"></div>
-                            <button onclick="addGuild()" class="epic-btn !bg-purple-500 !border-purple-700 py-2 text-xs">Establish</button>
+                            <div class="flex flex-col"><label class="text-[10px] text-gray-400 mb-1 uppercase tracking-widest">Team Name</label><input type="text" id="add-guild-name" placeholder="Team Name" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
+                            <div class="flex flex-col"><label class="text-[10px] text-gray-400 mb-1 uppercase tracking-widest">Logo</label><input type="file" id="add-guild-file" accept="image/*" class="text-xs text-gray-300"></div>
+                            <button onclick="addGuild()" class="epic-btn !bg-purple-500 !border-purple-700 py-2.5 text-xs">Establish</button>
                         </div>
                     </div>
                     <div id="admin-guilds-list" class="space-y-3"></div>
                 </div>
 
                 <div id="admin-pane-rewards" class="hidden space-y-4">
-                    <div class="epic-panel p-4 md:p-5 rounded">
+                    <div class="epic-panel p-5 rounded">
                         <h3 class="font-bold text-lg mb-2 text-white font-epic">Milestone Rewards</h3>
-                        <p class="text-[10px] md:text-xs text-gray-400 mb-4">Set main and extra rewards. Level 1-5 rewards auto-lock until player reaches Star 6.</p>
                         <div id="admin-rewards-list" class="space-y-4"></div>
                     </div>
                 </div>
 
                 <div id="admin-pane-content" class="hidden space-y-4">
-                    <div class="epic-panel p-4 md:p-5 rounded space-y-4">
+                    <div class="epic-panel p-5 rounded space-y-4">
                         <h3 class="font-bold text-lg text-white font-epic">Realm Content Settings</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Main Site Title</label><input type="text" id="edit-content-title" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
-                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loading Screen Text</label><input type="text" id="edit-content-loading" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
+                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Main Title</label><input type="text" id="edit-content-title" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
+                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hero Title</label><input type="text" id="edit-content-herotitle" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
+                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hero Subtitle</label><input type="text" id="edit-content-herosub" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
+                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loading Text</label><input type="text" id="edit-content-loading" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
                             <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Map Title</label><input type="text" id="edit-content-maptitle" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
                             <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Map Description</label><input type="text" id="edit-content-mapdesc" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
-                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Top Champions Title</label><input type="text" id="edit-content-champ-title" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
-                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Top Teams Title</label><input type="text" id="edit-content-team-title" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
-                            <div class="space-y-1 md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hero Title</label><input type="text" id="edit-content-herotitle" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
-                            <div class="space-y-1 md:col-span-2"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hero Subtitle</label><input type="text" id="edit-content-herosub" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
+                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Top Champions Title</label><input type="text" id="edit-content-champ" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
+                            <div class="space-y-1"><label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Top Teams Title</label><input type="text" id="edit-content-team" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm"></div>
                         </div>
                         
-                        <h4 class="font-bold text-sm text-white mt-6 border-t border-gray-800 pt-4 font-epic">Statistics Display (Home)</h4>
-                        <p class="text-[10px] text-gray-400">Add or remove stat blocks displayed on the home screen.</p>
+                        <h4 class="font-bold text-sm text-white mt-6 border-t border-gray-800 pt-4 font-epic">Statistics Boxes (Home Page)</h4>
                         <div id="admin-stats-list" class="space-y-2 mt-2"></div>
-                        <button onclick="window.addStatBox()" class="mt-3 text-[10px] text-gray-400 hover:text-white uppercase tracking-widest border border-gray-700 px-3 py-1 rounded"><i class="fa-solid fa-plus mr-1"></i> Add Box</button>
+                        <button onclick="window.addStatBox()" class="mt-3 text-[10px] text-gray-400 hover:text-white uppercase tracking-widest border border-gray-700 px-3 py-1 rounded">
+                            <i class="fa-solid fa-plus mr-1"></i> Add Box
+                        </button>
                         
                         <button onclick="window.saveSiteContent()" class="w-full epic-btn py-3 mt-6 text-sm">Save Changes</button>
                     </div>
                 </div>
 
                 <div id="admin-pane-settings" class="hidden space-y-4">
-                    <div class="epic-panel p-4 md:p-5 rounded">
+                    <div class="epic-panel p-5 rounded">
                         <h3 class="font-bold text-lg mb-2 text-white font-epic">Admin Passwords</h3>
                         <div class="flex gap-3 mb-4">
-                            <input type="text" id="add-pin-input" placeholder="New Password" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm max-w-xs">
+                            <input type="text" id="add-pin-input" placeholder="Enter new Password" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-3 py-2 text-sm max-w-xs">
                             <button onclick="addPin()" class="epic-btn py-2 px-4 text-xs">Add</button>
                         </div>
                         <div id="admin-pins-list" class="space-y-2 max-w-sm"></div>
@@ -414,7 +477,7 @@
                 <h3 class="font-epic text-xl font-bold text-white tracking-widest uppercase">ADMIN ACCESS</h3>
             </div>
             <div class="space-y-5">
-                <input type="password" id="admin-pin" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-4 py-3 text-center tracking-widest text-lg font-bold" placeholder="••••">
+                <div><input type="password" id="admin-pin" class="w-full epic-panel !bg-black/50 border !border-gray-700 rounded px-4 py-3 text-center tracking-widest text-lg font-bold" placeholder="••••"></div>
                 <button onclick="verifyAdmin()" class="w-full epic-btn !bg-red-600 !border-red-800 py-3 text-sm">Authenticate</button>
             </div>
         </div>
@@ -424,7 +487,7 @@
         <div class="modal-content epic-panel p-6 rounded border-t-2 border-t-yellow-500 w-80 relative text-center" onclick="event.stopPropagation()">
             <button onclick="closeModal('modal-edit-score')" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
             <h3 class="font-epic text-lg font-bold mb-1 text-white">Update Score</h3>
-            <p class="text-[10px] text-gray-400 mb-6" id="edit-score-desc"></p>
+            <p class="text-xs text-gray-400 mb-6" id="edit-score-desc">Player Name - Tgl X</p>
             <input type="hidden" id="edit-score-pid">
             <input type="hidden" id="edit-score-date">
             <select id="edit-score-val" class="w-full epic-panel !bg-black/50 border !border-gray-700 text-center font-bold text-xl py-3 rounded mb-6"></select>
@@ -449,15 +512,17 @@
     <div id="modal-message" class="modal-overlay" onclick="closeModal('modal-message')">
         <div class="modal-content epic-panel p-6 rounded w-[90%] max-w-lg text-center" onclick="event.stopPropagation()">
             <button onclick="closeModal('modal-message')" class="absolute top-4 right-4 text-gray-400 hover:text-white z-20"><i class="fa-solid fa-times"></i></button>
-            <h3 class="font-epic text-lg font-bold mb-3 text-white uppercase" id="modal-message-title">Notice</h3>
+            <h3 class="font-epic text-lg font-bold mb-3 text-white uppercase" id="modal-message-title">System Notice</h3>
             <div class="text-sm text-gray-300 mb-6" id="modal-message-text">Message</div>
+            
             <div id="modal-capture-area" class="hidden flex flex-col items-center">
                 <div class="max-h-[60vh] overflow-y-auto border border-gray-700 rounded mb-4 w-full bg-black">
-                    <img id="capture-img-preview" class="w-full h-auto block" src="" alt="Capture">
+                    <img id="capture-img-preview" class="w-full h-auto block" src="" alt="Report Capture">
                 </div>
-                <a id="capture-download-btn" href="#" class="w-full epic-btn py-3 text-sm text-center mb-2"><i class="fa-solid fa-download mr-2"></i> Save</a>
+                <a id="capture-download-btn" href="#" download="MoraRepublic_Report.png" class="w-full epic-btn py-3 text-sm text-center mb-2"><i class="fa-solid fa-download mr-2"></i> Save Report</a>
+                <p class="text-[10px] text-gray-500 italic">*If button fails, long-press the image and select "Save Image".</p>
             </div>
-            <button onclick="closeModal('modal-message')" id="modal-msg-ok-btn" class="w-full epic-btn py-3 text-sm">OK</button>
+            <button onclick="closeModal('modal-message')" id="modal-msg-ok-btn" class="w-full epic-btn py-3 text-sm">ACKNOWLEDGE</button>
         </div>
     </div>
 
@@ -503,20 +568,29 @@
         window.isAdmin = false;
 
         window.siteContent = {
-            title: "MoraRepublic", loadingText: "LOADING REALM",
-            mapTitle: "JOURNEY MAP", mapDesc: "Reach 30 stars to unlock IMMORTAL.",
-            heroTitle: "WELCOME TO RUNE REALMS", heroSub: "Join realm and clan wars for amazing rewards and establish your legacy.",
-            topChampionsTitle: "TOP CHAMPIONS", topTeamsTitle: "TOP TEAMS",
-            stats: [{ val: "20", lbl: "PLAYERS" }, { val: "30", lbl: "MILESTONES" }, { val: "7", lbl: "RANKS" }]
+            title: "MoraRepublic",
+            mapTitle: "JOURNEY MAP",
+            mapDesc: "Reach 30 stars to unlock IMMORTAL.",
+            heroTitle: "WELCOME TO RUNE REALMS",
+            heroSub: "Join realm and clan wars for amazing rewards and establish your legacy.",
+            loadingText: "LOADING REALM",
+            topChampionsTitle: "TOP CHAMPIONS",
+            topTeamsTitle: "TOP TEAMS",
+            stats: [
+                { val: "20", lbl: "PLAYERS" },
+                { val: "30", lbl: "MILESTONES" },
+                { val: "7", lbl: "RANKS" },
+                { val: "∞", lbl: "REWARDS" }
+            ]
         };
 
         const rankSystem = [
-            { id: 'payah', name: 'PAYAH', min: 0, max: 5, colorClass: 'rank-payah', bgClass: 'bg-payah' },
-            { id: 'epic', name: 'EPIC', min: 6, max: 10, colorClass: 'rank-epic', bgClass: 'bg-epic' },
-            { id: 'legend', name: 'LEGEND', min: 11, max: 14, colorClass: 'rank-legend', bgClass: 'bg-legend' },
-            { id: 'mythic', name: 'MYTHIC', min: 15, max: 19, colorClass: 'rank-mythic', bgClass: 'bg-mythic' },
-            { id: 'honor', name: 'HONOR', min: 20, max: 24, colorClass: 'rank-honor', bgClass: 'bg-honor' },
-            { id: 'glory', name: 'GLORY', min: 25, max: 29, colorClass: 'rank-glory', bgClass: 'bg-glory' },
+            { id: 'payah', name: 'P A Y A H', min: 0, max: 5, colorClass: 'rank-payah', bgClass: 'bg-payah' },
+            { id: 'epic', name: 'E P I C', min: 6, max: 10, colorClass: 'rank-epic', bgClass: 'bg-epic' },
+            { id: 'legend', name: 'L E G E N D', min: 11, max: 14, colorClass: 'rank-legend', bgClass: 'bg-legend' },
+            { id: 'mythic', name: 'M Y T H I C', min: 15, max: 19, colorClass: 'rank-mythic', bgClass: 'bg-mythic' },
+            { id: 'honor', name: 'H O N O R', min: 20, max: 24, colorClass: 'rank-honor', bgClass: 'bg-honor' },
+            { id: 'glory', name: 'G L O R Y', min: 25, max: 29, colorClass: 'rank-glory', bgClass: 'bg-glory' },
             { id: 'immortal', name: 'IMMORTAL', min: 30, max: 999, colorClass: 'rank-immortal', bgClass: 'bg-immortal' }
         ];
 
@@ -527,14 +601,19 @@
 
         window.getRankInfo = function(stars) { return rankSystem.find(r => stars >= r.min && stars <= r.max) || rankSystem[rankSystem.length - 1]; };
         window.generateId = function() { return Math.random().toString(36).substr(2, 9); };
-        window.changeMonth = function() { window.activeViewMonth = document.getElementById('global-month').value; window.renderAll(); };
+        
+        window.changeMonth = function() {
+            window.activeViewMonth = document.getElementById('global-month').value;
+            window.renderAll();
+        };
 
         window.recalculateGuildStars = function() {
             window.guildsData.forEach(g => g.totalStars = 0);
             window.playersData.forEach(p => {
+                const pStars = window.getPlayerStars(p, window.activeViewMonth);
                 if(p.guild_id) {
                     const guild = window.guildsData.find(g => g.id === p.guild_id);
-                    if(guild) guild.totalStars = (guild.totalStars || 0) + window.getPlayerStars(p, window.activeViewMonth);
+                    if(guild) guild.totalStars = (guild.totalStars || 0) + pStars;
                 }
             });
         };
@@ -543,8 +622,12 @@
             try {
                 window.applySiteContent();
                 window.recalculateGuildStars();
-                if(document.getElementById('global-month')) document.getElementById('global-month').value = window.activeViewMonth;
-                if(document.getElementById('global-month-mobile')) document.getElementById('global-month-mobile').value = window.activeViewMonth;
+                
+                const gMonth = document.getElementById('global-month');
+                const gMonthM = document.getElementById('global-month-mobile');
+                if(gMonth) gMonth.value = window.activeViewMonth;
+                if(gMonthM) gMonthM.value = window.activeViewMonth;
+
                 if(window.activeTab === 'map') window.renderMap();
                 if(window.activeTab === 'leaderboard') window.renderLeaderboard();
                 if(window.activeTab === 'home') window.renderHome();
@@ -554,22 +637,27 @@
 
         window.applySiteContent = function() {
             const safeSet = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
-            safeSet('nav-title', window.siteContent.title); document.title = window.siteContent.title;
+            safeSet('nav-title', window.siteContent.title || "MoraRepublic");
+            document.title = window.siteContent.title || "MoraRepublic";
+            safeSet('map-title', window.siteContent.mapTitle);
+            safeSet('map-desc', window.siteContent.mapDesc);
+            safeSet('hero-title', window.siteContent.heroTitle);
+            safeSet('hero-subtitle', window.siteContent.heroSub);
             safeSet('loading-text', window.siteContent.loadingText || "LOADING REALM");
-            safeSet('map-title', window.siteContent.mapTitle); safeSet('map-desc', window.siteContent.mapDesc);
-            safeSet('hero-title', window.siteContent.heroTitle); safeSet('hero-subtitle', window.siteContent.heroSub);
-            safeSet('home-champ-title', window.siteContent.topChampionsTitle || "TOP CHAMPIONS");
-            safeSet('home-team-title', window.siteContent.topTeamsTitle || "TOP TEAMS");
+            safeSet('title-champions', window.siteContent.topChampionsTitle || "TOP CHAMPIONS");
+            safeSet('title-teams', window.siteContent.topTeamsTitle || "TOP TEAMS");
             
             const statsContainer = document.getElementById('home-stats-container');
             if (statsContainer && window.siteContent.stats) {
-                let cols = window.siteContent.stats.length || 1;
+                let cols = window.siteContent.stats.length;
+                if(cols === 0) cols = 1;
                 let mdCols = cols > 4 ? 4 : cols; 
-                statsContainer.className = `grid grid-cols-2 md:grid-cols-${mdCols} gap-4 max-w-5xl`;
+                
+                statsContainer.className = `grid grid-cols-2 md:grid-cols-${mdCols} gap-4 max-w-5xl mx-auto`;
                 statsContainer.innerHTML = window.siteContent.stats.map(s => `
-                    <div class="epic-panel p-5 rounded flex flex-col items-center justify-center text-center">
-                        <div class="text-3xl md:text-4xl font-epic font-black text-white leading-none">${s.val}</div>
-                        <div class="text-[10px] md:text-xs text-gray-400 font-bold tracking-widest uppercase mt-2">${s.lbl}</div>
+                    <div class="epic-panel p-6 rounded flex flex-col items-center justify-center text-center hover:border-yellow-500/50 transition">
+                        <div class="text-3xl font-epic font-black text-white leading-none mb-1">${s.val}</div>
+                        <div class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">${s.lbl}</div>
                     </div>
                 `).join('');
             }
@@ -577,28 +665,32 @@
 
         window.renderMap = function() {
             const mapEl = document.getElementById('map-nodes');
-            if(!mapEl) return; mapEl.innerHTML = '';
+            if(!mapEl) return;
+            mapEl.innerHTML = '';
             
-            // Adjust offset for mobile vs desktop to prevent horizontal scrolling overflow
-            const isMobile = window.innerWidth < 768;
-            const offsetPattern = isMobile ? [0, 35, 0, -35] : [0, 80, 0, -80]; 
+            const baseOffset = window.innerWidth < 768 ? 40 : 60; 
+            const offsetPattern = [0, baseOffset, 0, -baseOffset];
             const targetStars = { 2: 'payah', 7: 'epic', 12: 'legend', 16: 'mythic', 21: 'honor', 26: 'glory' };
 
             for (let star = 30; star >= 0; star--) {
                 const isMax = star === 30;
                 const rank = window.getRankInfo(star);
-                const playersHere = window.playersData.filter(p => isMax ? window.getPlayerStars(p, window.activeViewMonth) >= 30 : window.getPlayerStars(p, window.activeViewMonth) === star);
+                const playersHere = window.playersData.filter(p => {
+                    const pStars = window.getPlayerStars(p, window.activeViewMonth);
+                    return isMax ? pStars >= 30 : pStars === star;
+                });
                 const rewardInfo = window.rewardsData.find(r => r.star === star);
                 
                 let displayReward = "";
-                let hasReward = rewardInfo && (rewardInfo.name || rewardInfo.name2);
-                let isLockedStar = (star >= 1 && star <= 5);
-
-                if(hasReward) {
-                    let rList = [];
-                    if(rewardInfo.name) rList.push(rewardInfo.name); if(rewardInfo.name2) rList.push(rewardInfo.name2);
-                    let icon = isLockedStar ? "fa-lock text-red-500" : "fa-gift text-yellow-400";
-                    displayReward = `<i class="fa-solid ${icon} mr-1 text-[8px]"></i><span class="truncate">${rList.join(' + ')}</span>`;
+                if(rewardInfo && (rewardInfo.name || rewardInfo.name2)) {
+                    if (star >= 1 && star <= 5) {
+                        displayReward = `<i class="fa-solid fa-lock text-red-500 mr-1 text-[10px]"></i><span class="text-gray-500">LOCKED</span>`;
+                    } else {
+                        let rewardsList = [];
+                        if(rewardInfo.name) rewardsList.push(rewardInfo.name);
+                        if(rewardInfo.name2) rewardsList.push(rewardInfo.name2);
+                        displayReward = `<i class="fa-solid fa-gift mr-1 text-[8px] text-yellow-400"></i>${rewardsList.join(' + ')}`;
+                    }
                 }
                 
                 const rankIndex = rankSystem.findIndex(r => r.id === rank.id);
@@ -607,40 +699,45 @@
 
                 let textOverlay = '';
                 if (isMax) {
-                    // Added more top spacing so "IMMORTAL" doesn't hit player tags
                     textOverlay = `
-                        <div class="absolute -top-40 md:-top-52 left-1/2 -translate-x-1/2 z-0 pointer-events-none flex flex-col items-center">
-                            <div class="w-[1px] h-24 md:h-32 bg-gradient-to-t from-blue-400 to-transparent mb-3"></div>
-                            <span class="relative font-epic font-black text-4xl md:text-5xl text-white tracking-[0.2em] uppercase z-10 whitespace-nowrap" style="text-shadow: none !important;">IMMORTAL</span>
+                        <div class="absolute -top-36 md:-top-44 left-1/2 -translate-x-1/2 z-0 pointer-events-none flex flex-col items-center">
+                            <div class="w-[1px] h-24 md:h-32 bg-gradient-to-t from-blue-400 to-transparent mb-2"></div>
+                            <span class="relative font-epic font-black text-4xl md:text-5xl text-white tracking-widest uppercase z-10 whitespace-nowrap sun-glow">
+                                IMMORTAL
+                            </span>
                         </div>`;
                 } else if (targetStars[star]) {
-                    // Spaced out the text and removed glow
-                    const spacedName = rank.name.split('').join('  '); 
-                    textOverlay = `<div class="absolute ${isRightSide ? 'right-2 md:right-16' : 'left-2 md:left-16'} top-1/2 -translate-y-1/2 z-0 pointer-events-none flex items-center justify-center">
-                        <span class="${isRightSide ? 'vertical-text-right' : 'vertical-text-left'} font-epic font-black text-3xl md:text-5xl ${rank.colorClass} opacity-[0.15] whitespace-nowrap" style="letter-spacing: 0.3em; line-height:1; text-shadow: none !important;">${spacedName}</span>
+                    textOverlay = `<div class="absolute ${isRightSide ? 'right-2 md:right-16' : 'left-2 md:left-16'} top-1/2 -translate-y-1/2 z-0 pointer-events-none">
+                        <span class="${isRightSide ? 'vertical-text-right' : 'vertical-text-left'} font-epic font-black text-4xl md:text-6xl text-gray-700/30 opacity-60">${rank.name}</span>
                     </div>`;
                 }
 
                 const nodeContainer = document.createElement('div');
-                nodeContainer.className = "relative w-full flex items-center justify-center";
-                const tagTextSize = playersHere.length > 4 ? 'text-[9px] px-2 py-1' : 'text-[10px] md:text-xs px-2.5 py-1';
+                nodeContainer.className = "relative w-full flex items-center justify-center min-h-[100px]";
+                const tagTextSize = playersHere.length > 4 ? 'text-[9px] px-2 py-1' : 'text-xs px-3 py-1';
 
                 nodeContainer.innerHTML = `
                     ${textOverlay}
                     <div class="w-full flex flex-col items-center justify-center relative z-10 transition-transform duration-300 hover:z-30" style="transform: translateX(${offsetX}px);">
                         ${playersHere.length > 0 ? `
-                            <div class="flex flex-wrap justify-center gap-1.5 mb-3 md:mb-4 max-w-[180px] md:max-w-[220px]">
-                                ${playersHere.map(p => `<div class="bg-[#1a1c23]/90 backdrop-blur border border-gray-700 rounded ${tagTextSize} font-bold cursor-pointer hover:border-yellow-500 transition shadow-lg text-white" onclick="window.showPlayerProfile('${p.id}')">${p.name}</div>`).join('')}
+                            <div class="flex flex-wrap justify-center gap-1.5 mb-3 max-w-[180px] md:max-w-[200px]">
+                                ${playersHere.map(p => `
+                                    <div class="bg-[#1a1c23] border border-gray-700 rounded ${tagTextSize} font-bold cursor-pointer hover:border-yellow-500 transition shadow-lg text-white" onclick="window.showPlayerProfile('${p.id}')">
+                                        ${p.name}
+                                    </div>
+                                `).join('')}
                             </div>
-                        ` : '<div class="h-6 md:h-8 mb-3 md:mb-4"></div>'}
+                        ` : '<div class="h-6 mb-3"></div>'}
 
-                        <div class="star-node flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full ${rank.bgClass} cursor-pointer relative" onclick="window.showMilestoneDetail(${star})">
-                            <span class="font-epic font-black text-xl md:text-2xl text-white drop-shadow-md">${isMax ? '30+' : star}</span>
-                            ${hasReward ? `<div class="absolute -bottom-1 -right-1 bg-[#1a1c23] border border-gray-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[9px] z-10 shadow"><i class="fa-solid ${isLockedStar ? 'fa-lock text-red-500' : 'fa-gift text-yellow-500'}"></i></div>` : ''}
+                        <div class="sphere-node flex items-center justify-center w-14 h-14 md:w-16 md:h-16 border border-gray-700 bg-gray-900 cursor-pointer relative z-20" onclick="window.showMilestoneDetail(${star})">
+                            <div class="absolute inset-0 rounded-full ${rank.bgClass} opacity-80 mix-blend-screen"></div>
+                            <span class="font-epic font-black text-xl md:text-2xl text-white relative z-10 drop-shadow-md">${isMax ? '30+' : star}</span>
+                            ${displayReward && !displayReward.includes('LOCKED') ? `<div class="absolute -bottom-2 -right-2 bg-yellow-500 text-black w-6 h-6 rounded-full flex items-center justify-center text-[10px] z-30 border-2 border-black shadow-lg"><i class="fa-solid fa-gift"></i></div>` : ''}
+                            ${displayReward && displayReward.includes('LOCKED') ? `<div class="absolute -bottom-2 -right-2 bg-gray-800 text-red-500 w-6 h-6 rounded-full flex items-center justify-center text-[10px] z-30 border-2 border-black shadow-lg"><i class="fa-solid fa-lock"></i></div>` : ''}
                         </div>
 
-                        <div class="mt-3 md:mt-4 text-center flex items-center justify-center z-20 h-5 w-full px-4">
-                            ${hasReward ? `<div class="flex items-center text-[8px] md:text-[9px] font-bold text-gray-300 bg-black/80 px-2.5 py-1 rounded border border-gray-700 uppercase tracking-widest cursor-pointer max-w-[160px] md:max-w-[200px]" onclick="window.showMilestoneDetail(${star})">${displayReward}</div>` : ''}
+                        <div class="mt-4 text-center flex items-center justify-center z-20 h-5">
+                            ${displayReward ? `<span class="text-[9px] font-bold bg-black/80 px-2 py-1 rounded border border-gray-700 uppercase tracking-widest cursor-pointer max-w-[200px] truncate" onclick="window.showMilestoneDetail(${star})">${displayReward}</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -652,7 +749,8 @@
             window.recalculateGuildStars();
             const query = (document.getElementById('lb-search')?.value || '').toLowerCase();
             const container = document.getElementById('lb-content');
-            if(!container) return; let html = '';
+            if(!container) return;
+            let html = '';
 
             if(window.activeLbTab === 'players') {
                 let sorted = [...window.playersData].sort((a, b) => window.getPlayerStars(b, window.activeViewMonth) - window.getPlayerStars(a, window.activeViewMonth));
@@ -666,20 +764,20 @@
                     const rankNum = index + 1;
                     
                     let medal = `<div class="w-10 h-10 flex items-center justify-center font-epic font-bold text-gray-500 text-lg">${rankNum}</div>`;
-                    if(rankNum === 1) medal = `<div class="w-10 h-10 flex items-center justify-center"><i class="fa-solid fa-crown text-3xl text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"></i></div>`;
-                    if(rankNum === 2) medal = `<div class="w-10 h-10 flex items-center justify-center"><i class="fa-solid fa-medal text-2xl text-gray-300 drop-shadow-[0_0_8px_rgba(209,213,219,0.8)]"></i></div>`;
-                    if(rankNum === 3) medal = `<div class="w-10 h-10 flex items-center justify-center"><i class="fa-solid fa-medal text-xl text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]"></i></div>`;
+                    if(rankNum === 1) medal = `<div class="w-10 h-10 flex items-center justify-center font-epic text-yellow-400 text-2xl drop-shadow-[0_0_5px_currentColor]"><i class="fa-solid fa-crown"></i></div>`;
+                    if(rankNum === 2) medal = `<div class="w-10 h-10 flex items-center justify-center font-epic text-gray-300 text-2xl"><i class="fa-solid fa-medal"></i></div>`;
+                    if(rankNum === 3) medal = `<div class="w-10 h-10 flex items-center justify-center font-epic text-orange-500 text-2xl"><i class="fa-solid fa-medal"></i></div>`;
 
                     html += `
-                        <div class="epic-panel p-3 md:p-4 rounded flex items-center gap-3 md:gap-4 cursor-pointer hover:border-yellow-500/50 transition" onclick="window.showPlayerProfile('${p.id}')">
+                        <div class="epic-panel p-4 rounded flex items-center gap-4 cursor-pointer hover:border-yellow-500/50 transition" onclick="window.showPlayerProfile('${p.id}')">
                             ${medal}
-                            <img src="${p.avatar}" class="w-10 h-10 md:w-12 md:h-12 rounded border border-gray-700 object-cover bg-black">
+                            <img src="${p.avatar}" class="w-12 h-12 rounded border border-gray-700 object-cover bg-black">
                             <div class="flex-grow min-w-0">
-                                <div class="font-bold text-sm md:text-base text-white truncate font-epic uppercase">${p.name}</div>
-                                <div class="text-[9px] md:text-[10px] text-gray-400 truncate uppercase tracking-widest">${guild ? guild.name : 'Independent'} • <span class="${rankInfo.colorClass} font-bold">${rankInfo.name}</span></div>
+                                <div class="font-bold text-base text-white truncate font-epic uppercase">${p.name}</div>
+                                <div class="text-[10px] text-gray-400 truncate uppercase tracking-widest">${guild ? guild.name : 'Independent'} • <span class="${rankInfo.colorClass}">${rankInfo.name.replace(/ /g,'')}</span></div>
                             </div>
                             <div class="text-right">
-                                <div class="font-bold text-lg md:text-xl text-yellow-500">${pStars} <span class="text-xs text-gray-600">⭐</span></div>
+                                <div class="font-bold text-xl text-yellow-500">${pStars} <span class="text-sm text-gray-600">⭐</span></div>
                             </div>
                         </div>
                     `;
@@ -692,24 +790,27 @@
                 sorted.forEach((g, index) => {
                     const rankNum = index + 1;
                     const members = window.playersData.filter(p => p.guild_id === g.id);
+                    
                     let medal = `<div class="w-10 h-10 flex items-center justify-center font-epic font-bold text-gray-500 text-lg">${rankNum}</div>`;
-                    if(rankNum === 1) medal = `<div class="w-10 h-10 flex items-center justify-center"><i class="fa-solid fa-crown text-3xl text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]"></i></div>`;
-                    if(rankNum === 2) medal = `<div class="w-10 h-10 flex items-center justify-center"><i class="fa-solid fa-medal text-2xl text-gray-300 drop-shadow-[0_0_8px_rgba(209,213,219,0.8)]"></i></div>`;
-                    if(rankNum === 3) medal = `<div class="w-10 h-10 flex items-center justify-center"><i class="fa-solid fa-medal text-xl text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]"></i></div>`;
+                    if(rankNum === 1) medal = `<div class="w-10 h-10 flex items-center justify-center font-epic text-yellow-400 text-2xl drop-shadow-[0_0_5px_currentColor]"><i class="fa-solid fa-crown"></i></div>`;
+                    if(rankNum === 2) medal = `<div class="w-10 h-10 flex items-center justify-center font-epic text-gray-300 text-2xl"><i class="fa-solid fa-medal"></i></div>`;
+                    if(rankNum === 3) medal = `<div class="w-10 h-10 flex items-center justify-center font-epic text-orange-500 text-2xl"><i class="fa-solid fa-medal"></i></div>`;
 
                     const logoImg = g.logo || `https://placehold.co/100x100/1a1a2e/d4af37?text=${g.name.charAt(0)}`;
                     html += `
-                        <div class="epic-panel p-4 rounded flex items-center justify-between gap-4 cursor-pointer hover:border-yellow-500/50 transition" onclick="window.showGuildProfile('${g.id}')">
-                            <div class="flex items-center gap-3 w-full">
+                        <div class="epic-panel p-5 rounded flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer hover:border-yellow-500/50 transition" onclick="window.showGuildProfile('${g.id}')">
+                            <div class="flex items-center gap-4 w-full md:w-auto">
                                 ${medal}
-                                <img src="${logoImg}" class="w-12 h-12 md:w-14 md:h-14 rounded border border-gray-700 object-cover bg-black">
-                                <div class="flex-grow min-w-0">
-                                    <div class="font-epic font-black text-sm md:text-lg text-white uppercase truncate">${g.name}</div>
-                                    <div class="text-[9px] md:text-[10px] text-gray-400 uppercase tracking-widest">${members.length} Members</div>
+                                <img src="${logoImg}" class="w-14 h-14 rounded border border-gray-700 object-cover bg-black">
+                                <div>
+                                    <div class="font-epic font-black text-lg text-white uppercase">${g.name}</div>
+                                    <div class="text-[10px] text-gray-400 uppercase tracking-widest">${members.length} Members</div>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <div class="font-bold text-xl md:text-2xl text-yellow-500">${g.totalStars || 0} <span class="text-xs text-gray-600">⭐</span></div>
+                            <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                                <div class="text-right">
+                                    <div class="font-bold text-2xl text-yellow-500">${g.totalStars || 0} <span class="text-sm text-gray-600">⭐</span></div>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -719,6 +820,7 @@
         };
 
         window.renderHome = function() {
+            window.recalculateGuildStars();
             const pContainer = document.getElementById('home-top-players');
             const gContainer = document.getElementById('home-top-guilds');
 
@@ -727,19 +829,32 @@
                 pContainer.innerHTML = topP.map((p, i) => {
                     const pStars = window.getPlayerStars(p, window.activeViewMonth);
                     const guild = window.guildsData.find(g => g.id === p.guild_id);
+                    const rankInfo = window.getRankInfo(pStars);
+                    const rewardInfo = window.rewardsData.find(r => r.star === pStars);
+                    
+                    let rewardText = 'No Reward';
+                    if (rewardInfo && (rewardInfo.name || rewardInfo.name2)) {
+                        if (pStars >= 1 && pStars <= 5) rewardText = '<i class="fa-solid fa-lock text-red-500"></i> Locked';
+                        else rewardText = `<i class="fa-solid fa-gift text-yellow-500"></i> ${rewardInfo.name || rewardInfo.name2}`;
+                    }
+
                     return `
                         <div class="flex items-center gap-3 bg-[#131720] p-3 rounded border border-gray-800 cursor-pointer hover:border-gray-600 transition" onclick="window.showPlayerProfile('${p.id}')">
                             <div class="font-epic font-bold text-gray-600 w-4 text-center text-sm">${i+1}</div>
                             <img src="${p.avatar}" class="w-10 h-10 rounded border border-gray-700 object-cover">
                             <div class="flex-grow min-w-0">
                                 <div class="font-bold text-sm text-white truncate font-epic uppercase">${p.name}</div>
-                                <div class="text-[9px] text-gray-500 truncate uppercase tracking-widest">${guild ? guild.name : 'Independent'}</div>
+                                <div class="text-[9px] text-gray-500 truncate uppercase tracking-widest">${guild ? guild.name : 'Independent'} • <span class="${rankInfo.colorClass}">${rankInfo.name.replace(/ /g,'')}</span></div>
                             </div>
-                            <div class="text-right font-bold text-sm text-yellow-500">${pStars} ⭐</div>
+                            <div class="text-right flex flex-col items-end">
+                                <div class="font-bold text-sm text-yellow-500">${pStars} ⭐</div>
+                                <div class="text-[8px] text-gray-400 mt-1 uppercase tracking-widest truncate max-w-[80px]">${rewardText}</div>
+                            </div>
                         </div>
                     `;
                 }).join('');
             }
+
             if(gContainer) {
                 const topG = [...window.guildsData].sort((a, b) => (b.totalStars || 0) - (a.totalStars || 0)).slice(0, 3);
                 gContainer.innerHTML = topG.map((g, i) => {
@@ -757,163 +872,40 @@
             }
         };
 
-        window.showPlayerProfile = function(id) {
-            const p = window.playersData.find(x => x.id === id);
-            if(!p) return;
-            const pStars = window.getPlayerStars(p, window.activeViewMonth);
-            const rank = window.getRankInfo(pStars);
-            const guild = window.guildsData.find(g => g.id === p.guild_id);
-            const progressPercent = pStars >= 30 ? 100 : (pStars / 30) * 100;
-
-            const earnedRewards = window.rewardsData.filter(r => r.star <= pStars && (r.name || r.name2)).sort((a,b) => b.star - a.star);
-            const nextReward = window.rewardsData.filter(r => r.star > pStars && (r.name || r.name2)).sort((a,b) => a.star - b.star)[0];
-
-            let rewardsHtml = '<div class="mt-4 text-left border-t border-gray-800 pt-3">';
-            rewardsHtml += '<div class="text-[10px] font-bold text-gray-500 tracking-widest uppercase mb-2">REWARDS STATUS</div>';
-            rewardsHtml += '<div class="space-y-2 max-h-[120px] overflow-y-auto hide-scrollbar">';
-            
-            if (earnedRewards.length > 0) {
-                earnedRewards.forEach(r => {
-                    let rText = [r.name, r.name2].filter(Boolean).join(' + ');
-                    let isLocked = (r.star >= 1 && r.star <= 5 && pStars < 6); 
-                    
-                    if (isLocked) {
-                        rewardsHtml += `<div class="bg-red-900/10 border border-red-900/30 p-2 rounded flex items-start gap-2"><i class="fa-solid fa-lock text-red-500 text-xs mt-0.5"></i><div class="text-[10px] text-red-400 leading-tight"><b>Star ${r.star}:</b> ${rText} <br><span class="text-[8px] opacity-75">Unlocks at Star 6</span></div></div>`;
-                    } else {
-                        rewardsHtml += `<div class="bg-green-900/10 border border-green-900/30 p-2 rounded flex items-start gap-2"><i class="fa-solid fa-check text-green-500 text-xs mt-0.5"></i><div class="text-[10px] text-green-400 leading-tight"><b>Star ${r.star}:</b> ${rText}</div></div>`;
-                    }
-                });
-            } else {
-                rewardsHtml += `<div class="text-[10px] text-gray-600 italic font-epic">No rewards unlocked yet.</div>`;
-            }
-            rewardsHtml += '</div>';
-
-            if (nextReward) {
-                let nextText = [nextReward.name, nextReward.name2].filter(Boolean).join(' + ');
-                rewardsHtml += '<div class="mt-3 pt-3 border-t border-gray-800">';
-                rewardsHtml += '<div class="text-[10px] font-bold text-gray-500 tracking-widest uppercase mb-2">NEXT REWARD</div>';
-                rewardsHtml += `<div class="bg-gray-900/50 border border-gray-800 p-2 rounded flex items-start gap-2"><i class="fa-solid fa-lock text-gray-500 text-xs mt-0.5"></i><div class="text-[10px] text-gray-400 leading-tight"><b>Star ${nextReward.star}:</b> ${nextText}</div></div>`;
-                rewardsHtml += '</div>';
-            }
-            rewardsHtml += '</div>';
-
-            let html = `
-                <div class="relative w-20 h-20 md:w-24 md:h-24 mx-auto mb-3">
-                    <img src="${p.avatar}" class="w-full h-full rounded-full object-cover border-2 border-gray-600 bg-black shadow-lg">
-                </div>
-                <h2 class="font-epic font-black text-xl md:text-2xl text-white mt-2 uppercase">${p.name}</h2>
-                <div class="text-[9px] md:text-[10px] font-bold text-gray-400 tracking-widest mt-1 uppercase">${guild ? guild.name : 'INDEPENDENT'}</div>
-                
-                <div class="mt-4 md:mt-6 bg-[#0a0b10] p-3 md:p-4 rounded border border-gray-800">
-                    <div class="flex justify-between items-end mb-2">
-                        <div class="text-[9px] md:text-[10px] font-bold text-gray-500 tracking-widest uppercase">STARS</div>
-                        <div class="font-epic font-bold text-lg md:text-xl text-yellow-500">${pStars} <span class="text-[10px] text-gray-600">/ 30</span></div>
-                    </div>
-                    <div class="w-full h-1.5 bg-gray-900 rounded overflow-hidden">
-                        <div class="h-full bg-yellow-500 transition-all duration-1000" style="width: ${progressPercent}%;"></div>
-                    </div>
-                    <div class="text-[10px] md:text-xs font-bold ${rank.colorClass} mt-3 uppercase tracking-widest font-epic text-center">${rank.name}</div>
-                </div>
-                ${rewardsHtml}
-            `;
-            document.getElementById('profile-content').innerHTML = html;
-            document.getElementById('modal-profile').classList.add('active');
-        };
-
-        window.showGuildProfile = function(guildId) { /* logic remains unchanged, formatting fixed above */
-            const guild = window.guildsData.find(g => g.id === guildId);
-            if(!guild) return;
-            const members = window.playersData.filter(p => p.guild_id === guildId).sort((a,b) => window.getPlayerStars(b, window.activeViewMonth) - window.getPlayerStars(a, window.activeViewMonth));
-            const logoImg = guild.logo || `https://placehold.co/100x100/1a1a2e/d4af37?text=${guild.name.charAt(0)}`;
-
-            let html = `
-                <div class="mb-4 flex flex-col items-center">
-                    <img src="${logoImg}" class="w-16 h-16 rounded border border-gray-600 object-cover bg-black mb-3">
-                    <h2 class="font-epic font-black text-xl md:text-2xl text-white uppercase">${guild.name}</h2>
-                    <div class="font-bold text-xl md:text-2xl text-yellow-500 mt-2">${guild.totalStars || 0} ⭐</div>
-                    <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">TOTAL STARS</div>
-                </div>
-                <div class="w-full h-px bg-gray-800 my-4"></div>
-                <div class="text-left mb-2 text-[10px] font-bold text-gray-500 tracking-widest uppercase">MEMBERS (${members.length})</div>
-                <div class="space-y-2 max-h-[40vh] overflow-y-auto pr-1 hide-scrollbar">
-            `;
-            if(members.length === 0) html += `<div class="text-xs text-gray-600 italic text-center py-4 font-epic">No members yet.</div>`;
-            else {
-                members.forEach((m, index) => {
-                    const mStars = window.getPlayerStars(m, window.activeViewMonth);
-                    html += `
-                        <div class="flex items-center gap-3 bg-[#0a0b10] border border-gray-800 p-2 rounded cursor-pointer hover:border-gray-600 transition" onclick="window.closeModal('modal-guild'); window.showPlayerProfile('${m.id}')">
-                            <div class="font-bold text-gray-600 text-[10px] w-4 text-center">${index+1}</div>
-                            <img src="${m.avatar}" class="w-8 h-8 rounded border border-gray-700 object-cover bg-black">
-                            <div class="flex-grow min-w-0 text-left"><div class="font-bold text-white text-[10px] md:text-xs truncate font-epic uppercase">${m.name}</div></div>
-                            <div class="text-right text-[10px] md:text-xs font-bold text-yellow-500">${mStars} ⭐</div>
-                        </div>
-                    `;
-                });
-            }
-            html += `</div>`;
-            document.getElementById('guild-modal-content').innerHTML = html;
-            document.getElementById('modal-guild').classList.add('active');
-        };
-
-        window.showMilestoneDetail = function(star) {
-            const rewardInfo = window.rewardsData.find(r => r.star === star);
-            const playersHere = window.playersData.filter(p => star === 30 ? window.getPlayerStars(p, window.activeViewMonth) >= 30 : window.getPlayerStars(p, window.activeViewMonth) === star);
-            
-            let rewardHtml = '<div class="text-xs text-gray-600 italic mb-6 font-epic text-center">No rewards assigned.</div>';
-            if(rewardInfo && (rewardInfo.name || rewardInfo.name2)) {
-                let isLockedStar = (star >= 1 && star <= 5);
-                rewardHtml = '<div class="bg-[#0a0b10] border border-gray-800 rounded p-4 text-left mb-6 space-y-3 relative overflow-hidden">';
-                if(isLockedStar) rewardHtml += `<div class="absolute top-0 right-0 bg-red-900/50 text-red-300 text-[8px] font-bold px-2 py-1 rounded-bl border-b border-l border-red-900"><i class="fa-solid fa-lock mr-1"></i>UNLOCKS LVL 6</div>`;
-                
-                if(rewardInfo.name) rewardHtml += `<div><div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">MAIN REWARD</div><div class="text-sm font-bold text-white">${rewardInfo.name}</div></div>`;
-                if(rewardInfo.name2) {
-                    if(rewardInfo.name) rewardHtml += '<div class="w-full h-px bg-gray-800 my-2"></div>';
-                    rewardHtml += `<div><div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">EXTRA REWARD</div><div class="text-sm font-bold text-white">${rewardInfo.name2}</div></div>`;
-                }
-                rewardHtml += '</div>';
-            }
-
-            let playersHtml = '<div class="text-xs text-gray-600 italic font-epic text-center py-2">No champions reached this point yet.</div>';
-            if(playersHere.length > 0) {
-                playersHtml = '<div class="space-y-2 max-h-[30vh] overflow-y-auto pr-1 text-left hide-scrollbar">';
-                playersHere.forEach(p => {
-                    playersHtml += `
-                        <div class="flex items-center gap-3 bg-[#0a0b10] border border-gray-800 p-2 rounded cursor-pointer hover:border-gray-600 transition" onclick="window.closeModal('modal-milestone'); window.showPlayerProfile('${p.id}')">
-                            <img src="${p.avatar}" class="w-8 h-8 rounded border border-gray-700 object-cover bg-black">
-                            <div class="flex-grow min-w-0"><div class="font-bold text-white text-xs truncate font-epic uppercase">${p.name}</div></div>
-                        </div>
-                    `;
-                });
-                playersHtml += '</div>';
-            }
-
-            const html = `<div class="mb-6 text-center"><h3 class="font-epic text-2xl font-black text-white">STAR ${star === 30 ? '30+' : star}</h3></div>${rewardHtml}
-                <div class="text-left mb-2 text-[10px] font-bold text-gray-500 tracking-widest uppercase border-b border-gray-800 pb-1">CHAMPIONS AT THIS MILESTONE (${playersHere.length})</div>${playersHtml}`;
-            document.getElementById('milestone-content').innerHTML = html;
-            document.getElementById('modal-milestone').classList.add('active');
-        };
-
         window.renderAdminPanes = function() {
-            // ... Logic kept identical to previous robust version, updating HTML IDs
+            window.recalculateGuildStars();
             const monthLbl = document.getElementById('admin-score-month-lbl');
             if(monthLbl) monthLbl.innerText = window.activeViewMonth;
             
             const scoreTable = document.getElementById('admin-score-table');
             if(scoreTable) {
+                const todayObj = new Date();
+                const todayDate = todayObj.getDate();
+                const isCurrentMonth = (window.activeViewMonth === currentRealMonth);
+                
                 let thHtml = '<tr><th class="p-2 border border-gray-800 bg-[#0a0b10] sticky left-0 z-10 w-32 uppercase tracking-widest">Champion</th><th class="p-2 border border-gray-800 bg-[#0a0b10] text-center text-yellow-500">Tot</th>';
-                for(let i=1; i<=31; i++) thHtml += `<th class="p-1 border border-gray-800 bg-[#0a0b10] text-center w-8 text-gray-500">${i}</th>`;
+                for(let i=1; i<=31; i++) { 
+                    const isToday = isCurrentMonth && i === todayDate;
+                    const bgClass = isToday ? 'bg-blue-900/40 text-blue-300 border-blue-500' : 'bg-[#0a0b10] text-gray-500';
+                    thHtml += `<th class="p-1 border border-gray-800 ${bgClass} text-center w-8">${i}</th>`; 
+                }
                 thHtml += '</tr>';
+                
                 let tbodyHtml = '';
                 const renderGroupRows = (players) => {
                     let rows = '';
                     players.forEach(p => {
                         const pHistory = (p.history && p.history[window.activeViewMonth]) ? p.history[window.activeViewMonth] : {};
                         const total = window.getPlayerStars(p, window.activeViewMonth);
-                        rows += `<tr><td class="p-2 border border-gray-800 bg-[#0a0b10] sticky left-0 z-10 font-bold truncate max-w-[120px] text-white">${p.name}</td><td class="p-2 border border-gray-800 text-center font-bold text-yellow-500 bg-gray-900/50">${total}</td>`;
+                        rows += `<tr>
+                            <td class="p-2 border border-gray-800 bg-[#0a0b10] sticky left-0 z-10 font-bold truncate max-w-[120px] text-white">${p.name}</td>
+                            <td class="p-2 border border-gray-800 text-center font-bold text-yellow-500 bg-gray-900/50">${total}</td>`;
+                        
                         for(let i=1; i<=31; i++) {
                             const val = pHistory[i] || 0;
-                            const cellClass = val > 0 ? "bg-yellow-900/20 text-yellow-500 font-bold" : "text-gray-700";
+                            const isToday = isCurrentMonth && i === todayDate;
+                            let cellClass = val > 0 ? "bg-yellow-900/20 text-yellow-500 font-bold" : "text-gray-700";
+                            if (val === 0 && isToday) cellClass = "bg-blue-900/20 text-blue-300/50";
                             rows += `<td class="p-1 border border-gray-800 text-center cursor-pointer hover:bg-gray-800 transition ${cellClass}" onclick="window.openScoreEditor('${p.id}', ${i})">${val > 0 ? val : '-'}</td>`;
                         }
                         rows += `</tr>`;
@@ -928,6 +920,7 @@
                         tbodyHtml += renderGroupRows(members);
                     }
                 });
+
                 const noGuildMembers = window.playersData.filter(p => !p.guild_id);
                 if(noGuildMembers.length > 0) {
                     tbodyHtml += `<tr><td colspan="33" class="bg-[#131720] border border-gray-800 p-2 font-epic font-bold text-gray-500 tracking-widest uppercase">INDEPENDENT</td></tr>`;
@@ -937,48 +930,90 @@
             }
 
             const pGuildSelect = document.getElementById('add-player-guild');
-            if(pGuildSelect) pGuildSelect.innerHTML = '<option value="">Independent</option>' + window.guildsData.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+            if(pGuildSelect) {
+                const guildOptions = window.guildsData.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+                pGuildSelect.innerHTML = '<option value="">Independent</option>' + guildOptions;
+            }
 
             const pList = document.getElementById('admin-players-list');
-            if(pList) pList.innerHTML = window.playersData.map(p => `
-                <div class="bg-[#131720] border border-gray-800 p-3 rounded flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-                    <div class="flex items-center gap-3 w-full md:w-auto">
-                        <img src="${p.avatar}" class="w-10 h-10 rounded border border-gray-700 object-cover bg-black">
-                        <div class="flex-grow"><input type="text" value="${p.name}" onchange="window.updatePlayer('${p.id}', 'name', this.value)" class="bg-black border border-gray-700 rounded px-2 py-1 text-xs font-bold text-white w-full max-w-[150px] outline-none font-epic uppercase"><input type="file" accept="image/*" onchange="window.handleImageUpload(this, (res) => { if(res) window.updatePlayer('${p.id}', 'avatar', res); })" class="text-[9px] text-gray-500 w-full mt-1"></div>
+            if(pList) {
+                pList.innerHTML = window.playersData.map(p => `
+                    <div class="bg-[#131720] border border-gray-800 p-4 rounded flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div class="flex items-center gap-3 w-full md:w-auto">
+                            <img src="${p.avatar}" class="w-12 h-12 rounded border border-gray-700 object-cover bg-black">
+                            <div class="flex-grow">
+                                <input type="text" value="${p.name}" onchange="window.updatePlayer('${p.id}', 'name', this.value)" class="bg-black border border-gray-700 rounded px-2 py-1 text-sm font-bold text-white w-full max-w-[150px] outline-none focus:border-yellow-500 uppercase font-epic">
+                                <div class="mt-2 flex items-center gap-2">
+                                    <input type="file" accept="image/*" onchange="window.handleImageUpload(this, (res) => { if(res) window.updatePlayer('${p.id}', 'avatar', res); })" class="text-[10px] text-gray-500 w-full max-w-[150px]">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 w-full md:w-auto justify-between">
+                            <select onchange="window.updatePlayer('${p.id}', 'guild_id', this.value)" class="bg-black border border-gray-700 rounded px-2 py-1 text-xs text-gray-300 max-w-[120px] uppercase">
+                                <option value="">Independent</option>
+                                ${window.guildsData.map(g => `<option value="${g.id}" ${g.id === p.guild_id ? 'selected' : ''}>${g.name}</option>`).join('')}
+                            </select>
+                            <button onclick="window.deletePlayer('${p.id}')" class="text-red-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2 w-full md:w-auto justify-between">
-                        <select onchange="window.updatePlayer('${p.id}', 'guild_id', this.value)" class="bg-black border border-gray-700 rounded px-2 py-1 text-[10px] text-gray-300 max-w-[120px] uppercase"><option value="">Independent</option>${window.guildsData.map(g => `<option value="${g.id}" ${g.id === p.guild_id ? 'selected' : ''}>${g.name}</option>`).join('')}</select>
-                        <button onclick="window.deletePlayer('${p.id}')" class="text-red-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash text-xs"></i></button>
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
 
             const gList = document.getElementById('admin-guilds-list');
-            if(gList) gList.innerHTML = window.guildsData.map(g => {
-                const logoImg = g.logo || `https://placehold.co/100x100/1a1a2e/d4af37?text=${g.name.charAt(0)}`;
-                return `<div class="bg-[#131720] border border-gray-800 p-3 rounded flex flex-col md:flex-row items-center justify-between gap-3"><div class="flex-grow flex gap-3 items-center w-full"><img src="${logoImg}" class="w-10 h-10 rounded border border-gray-700 object-cover bg-black"><div><input type="text" value="${g.name}" onchange="window.updateGuild('${g.id}', 'name', this.value)" class="bg-black border border-gray-700 rounded px-2 py-1 text-xs font-bold text-white max-w-[150px] outline-none font-epic uppercase"><input type="file" accept="image/*" onchange="window.handleImageUpload(this, (res) => { if(res) window.updateGuild('${g.id}', 'logo', res); })" class="text-[9px] text-gray-500 mt-1 block"></div><span class="text-xs text-yellow-500 font-bold ml-auto">${g.totalStars || 0} ⭐</span></div><button onclick="window.deleteGuild('${g.id}')" class="text-red-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash text-xs"></i></button></div>`;
-            }).join('');
+            if(gList) {
+                gList.innerHTML = window.guildsData.map(g => {
+                    const logoImg = g.logo || `https://placehold.co/100x100/1a1a2e/d4af37?text=${g.name.charAt(0)}`;
+                    return `
+                    <div class="bg-[#131720] border border-gray-800 p-3 rounded flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="flex-grow flex gap-4 items-center w-full">
+                            <img src="${logoImg}" class="w-12 h-12 rounded border border-gray-700 object-cover bg-black">
+                            <div>
+                                <input type="text" value="${g.name}" onchange="window.updateGuild('${g.id}', 'name', this.value)" class="bg-black border border-gray-700 rounded px-2 py-1 text-sm font-bold text-white max-w-[200px] outline-none font-epic uppercase">
+                                <div class="mt-2">
+                                    <input type="file" accept="image/*" onchange="window.handleImageUpload(this, (res) => { if(res) window.updateGuild('${g.id}', 'logo', res); })" class="text-[10px] text-gray-500">
+                                </div>
+                            </div>
+                            <span class="text-sm text-yellow-500 font-bold ml-auto">${g.totalStars || 0} ⭐</span>
+                        </div>
+                        <button onclick="window.deleteGuild('${g.id}')" class="text-red-500 hover:text-red-400 p-2"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `}).join('');
+            }
 
             const rList = document.getElementById('admin-rewards-list');
             if(rList) {
                 const sortedRewards = [...window.rewardsData].sort((a, b) => a.star - b.star);
                 rList.innerHTML = sortedRewards.map(r => `
-                    <div class="bg-[#131720] border border-gray-800 p-3 rounded flex flex-col gap-2 relative">
-                        ${(r.star >= 1 && r.star <= 5) ? `<div class="absolute top-2 right-3 text-red-500 text-[9px] font-bold"><i class="fa-solid fa-lock mr-1"></i>LOCKED TILL LVL 6</div>` : ''}
+                    <div class="bg-[#131720] border border-gray-800 p-4 rounded flex flex-col gap-3">
                         <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                            <div class="font-epic font-bold text-white text-xs">⭐ STAR ${r.star}</div>
-                            <button onclick="window.saveReward(${r.star})" class="text-[9px] bg-gray-800 hover:bg-gray-700 text-white px-3 py-1 rounded font-bold uppercase tracking-widest mt-1 md:mt-0">SAVE</button>
+                            <div class="font-epic font-bold text-white text-sm">⭐ STAR ${r.star}</div>
+                            <button onclick="window.saveReward(${r.star})" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-white px-3 py-1 rounded font-bold uppercase tracking-widest">SAVE</button>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
-                            <div class="space-y-1"><label class="text-[8px] text-gray-500 font-bold uppercase">Main Reward</label><input type="text" id="rew-name-${r.star}" value="${r.name || ''}" placeholder="Name" class="w-full bg-black border border-gray-700 rounded px-2 py-1 text-[10px] text-white"></div>
-                            <div class="space-y-1"><label class="text-[8px] text-gray-500 font-bold uppercase">Extra Reward</label><input type="text" id="rew-name2-${r.star}" value="${r.name2 || ''}" placeholder="Name" class="w-full bg-black border border-gray-700 rounded px-2 py-1 text-[10px] text-white"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Main Reward</label>
+                                <input type="text" id="rew-name-${r.star}" value="${r.name || ''}" placeholder="E.g. Rp 50.000" class="w-full bg-black border border-gray-700 rounded px-2 py-1 text-xs text-white">
+                                <input type="text" id="rew-desc-${r.star}" value="${r.desc || ''}" placeholder="Description" class="w-full bg-black border border-gray-700 rounded px-2 py-1 text-xs text-gray-400">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Extra Reward</label>
+                                <input type="text" id="rew-name2-${r.star}" value="${r.name2 || ''}" placeholder="E.g. Item Code" class="w-full bg-black border border-gray-700 rounded px-2 py-1 text-xs text-white">
+                                <input type="text" id="rew-desc2-${r.star}" value="${r.desc2 || ''}" placeholder="Description" class="w-full bg-black border border-gray-700 rounded px-2 py-1 text-xs text-gray-400">
+                            </div>
                         </div>
                     </div>
                 `).join('');
             }
 
             const pinList = document.getElementById('admin-pins-list');
-            if(pinList) pinList.innerHTML = window.validPins.map((pin, i) => `<div class="flex justify-between items-center bg-[#131720] border border-gray-800 p-2 rounded"><span class="font-mono text-sm tracking-widest text-gray-300">${pin}</span>${window.validPins.length > 1 ? `<button onclick="window.removePin(${i})" class="text-red-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>` : '<span class="text-[9px] text-gray-600">Default</span>'}</div>`).join('');
+            if(pinList) {
+                pinList.innerHTML = window.validPins.map((pin, i) => `
+                    <div class="flex justify-between items-center bg-[#131720] border border-gray-800 p-2 rounded">
+                        <span class="font-mono text-sm tracking-widest text-gray-300">${pin}</span>
+                        ${window.validPins.length > 1 ? `<button onclick="window.removePin(${i})" class="text-red-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button>` : '<span class="text-[10px] text-gray-600">Default</span>'}
+                    </div>
+                `).join('');
+            }
 
             const adminStatsList = document.getElementById('admin-stats-list');
             if (adminStatsList && window.siteContent.stats) {
@@ -993,27 +1028,208 @@
 
             const safeSetVal = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
             safeSetVal('edit-content-title', window.siteContent.title);
+            safeSetVal('edit-content-maptitle', window.siteContent.mapTitle);
+            safeSetVal('edit-content-mapdesc', window.siteContent.mapDesc);
+            safeSetVal('edit-content-herotitle', window.siteContent.heroTitle);
+            safeSetVal('edit-content-herosub', window.siteContent.heroSub);
             safeSetVal('edit-content-loading', window.siteContent.loadingText);
-            safeSetVal('edit-content-maptitle', window.siteContent.mapTitle); safeSetVal('edit-content-mapdesc', window.siteContent.mapDesc);
-            safeSetVal('edit-content-champ-title', window.siteContent.topChampionsTitle); safeSetVal('edit-content-team-title', window.siteContent.topTeamsTitle);
-            safeSetVal('edit-content-herotitle', window.siteContent.heroTitle); safeSetVal('edit-content-herosub', window.siteContent.heroSub);
+            safeSetVal('edit-content-champ', window.siteContent.topChampionsTitle);
+            safeSetVal('edit-content-team', window.siteContent.topTeamsTitle);
+        };
+
+        window.showPlayerProfile = function(id) {
+            const p = window.playersData.find(x => x.id === id);
+            if(!p) return;
+            const pStars = window.getPlayerStars(p, window.activeViewMonth);
+            const rank = window.getRankInfo(pStars);
+            const guild = window.guildsData.find(g => g.id === p.guild_id);
+            const isMax = pStars >= 30;
+            const progressPercent = isMax ? 100 : (pStars / 30) * 100;
+            
+            const exactReward = window.rewardsData.find(r => r.star === pStars);
+            let rewardHtml = '';
+            
+            const isLocked = pStars >= 1 && pStars <= 5;
+
+            if (exactReward && (exactReward.name || exactReward.name2)) {
+                if (isLocked) {
+                    rewardHtml = `
+                        <div class="mt-4 bg-[#131720] border border-gray-800 rounded p-3 text-left">
+                            <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">REWARD STATUS (STAR ${pStars})</div>
+                            <div class="text-sm font-bold text-red-500"><i class="fa-solid fa-lock mr-2"></i>LOCKED</div>
+                            <div class="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-widest">Unlocks at Star 6</div>
+                        </div>
+                    `;
+                } else {
+                    rewardHtml = `
+                        <div class="mt-4 bg-[#131720] border border-gray-800 rounded p-3 text-left">
+                            <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">CURRENT REWARD (STAR ${pStars})</div>
+                            ${exactReward.name ? `<div class="text-sm font-bold text-yellow-400"><i class="fa-solid fa-gift mr-2"></i>${exactReward.name}</div>` : ''}
+                            ${exactReward.name2 ? `<div class="text-xs font-bold text-gray-300 mt-1">${exactReward.name ? '+ ' : ''}${exactReward.name2}</div>` : ''}
+                        </div>
+                    `;
+                }
+            } else {
+                 rewardHtml = `
+                    <div class="mt-4 bg-[#131720] border border-gray-800 rounded p-3 text-center">
+                        <div class="text-[10px] text-gray-500 italic font-epic uppercase tracking-widest">No reward at Star ${pStars}</div>
+                    </div>
+                `;
+            }
+
+            let html = `
+                <div class="relative w-24 h-24 mx-auto mb-4">
+                    <img src="${p.avatar}" class="w-full h-full rounded object-cover border-2 border-gray-600 bg-black">
+                </div>
+                <h2 class="font-epic font-black text-2xl text-white mt-4 uppercase">${p.name}</h2>
+                <div class="text-[10px] font-bold text-gray-400 tracking-widest mt-1 uppercase">${guild ? guild.name : 'INDEPENDENT'}</div>
+                
+                <div class="mt-6 bg-[#0a0b10] p-4 rounded border border-gray-800">
+                    <div class="flex justify-between items-end mb-2">
+                        <div class="text-[10px] font-bold text-gray-500 tracking-widest uppercase">STARS</div>
+                        <div class="font-epic font-bold text-xl text-yellow-500">${pStars} <span class="text-xs text-gray-600">/ 30</span></div>
+                    </div>
+                    <div class="w-full h-1.5 bg-gray-900 rounded overflow-hidden">
+                        <div class="h-full bg-yellow-500 transition-all duration-1000" style="width: ${progressPercent}%;"></div>
+                    </div>
+                    <div class="text-xs font-bold ${rank.colorClass} mt-3 uppercase tracking-widest font-epic text-center">${rank.name.replace(/ /g,'')}</div>
+                </div>
+                ${rewardHtml}
+            `;
+            document.getElementById('profile-content').innerHTML = html;
+            document.getElementById('modal-profile').classList.add('active');
+        };
+
+        window.showGuildProfile = function(guildId) {
+            const guild = window.guildsData.find(g => g.id === guildId);
+            if(!guild) return;
+            const members = window.playersData.filter(p => p.guild_id === guildId).sort((a,b) => window.getPlayerStars(b, window.activeViewMonth) - window.getPlayerStars(a, window.activeViewMonth));
+            const logoImg = guild.logo || `https://placehold.co/100x100/1a1a2e/d4af37?text=${guild.name.charAt(0)}`;
+
+            let html = `
+                <div class="mb-4 flex flex-col items-center">
+                    <img src="${logoImg}" class="w-16 h-16 rounded border border-gray-600 object-cover bg-black mb-3">
+                    <h2 class="font-epic font-black text-2xl text-white uppercase">${guild.name}</h2>
+                    <div class="font-bold text-2xl text-yellow-500 mt-2">${guild.totalStars || 0} ⭐</div>
+                    <div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">TOTAL STARS</div>
+                </div>
+                <div class="w-full h-px bg-gray-800 my-4"></div>
+                <div class="text-left mb-2 text-[10px] font-bold text-gray-500 tracking-widest uppercase">MEMBERS (${members.length})</div>
+                <div class="space-y-2 max-h-[40vh] overflow-y-auto pr-1 hide-scrollbar">
+            `;
+
+            if(members.length === 0) html += `<div class="text-xs text-gray-600 italic text-center py-4 font-epic">No members yet.</div>`;
+            else {
+                members.forEach((m, index) => {
+                    const mStars = window.getPlayerStars(m, window.activeViewMonth);
+                    const mRankInfo = window.getRankInfo(mStars);
+                    const mReward = window.rewardsData.find(r => r.star === mStars);
+                    let mRewardText = 'No Reward';
+                    
+                    if(mReward && (mReward.name || mReward.name2)) {
+                        if (mStars >= 1 && mStars <= 5) mRewardText = '<i class="fa-solid fa-lock text-red-500"></i> Locked';
+                        else mRewardText = `<i class="fa-solid fa-gift text-yellow-500"></i> ${mReward.name || mReward.name2}`;
+                    }
+
+                    html += `
+                        <div class="flex items-center gap-3 bg-[#0a0b10] border border-gray-800 p-2.5 rounded cursor-pointer hover:border-gray-600 transition" onclick="window.closeModal('modal-guild'); window.showPlayerProfile('${m.id}')">
+                            <div class="font-bold text-gray-600 text-[10px] w-4 text-center">${index+1}</div>
+                            <img src="${m.avatar}" class="w-8 h-8 rounded border border-gray-700 object-cover bg-black">
+                            <div class="flex-grow min-w-0 text-left">
+                                <div class="font-bold text-white text-xs truncate font-epic uppercase">${m.name}</div>
+                                <div class="text-[9px] text-gray-500 truncate uppercase tracking-widest"><span class="${mRankInfo.colorClass}">${mRankInfo.name.replace(/ /g,'')}</span></div>
+                            </div>
+                            <div class="text-right flex flex-col items-end">
+                                <div class="text-xs font-bold text-yellow-500">${mStars} ⭐</div>
+                                <div class="text-[8px] text-gray-400 mt-1 uppercase tracking-widest truncate max-w-[80px]">${mRewardText}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            html += `</div>`;
+            document.getElementById('guild-modal-content').innerHTML = html;
+            document.getElementById('modal-guild').classList.add('active');
+        };
+
+        window.showMilestoneDetail = function(star) {
+            const rewardInfo = window.rewardsData.find(r => r.star === star);
+            const playersHere = window.playersData.filter(p => {
+                const pStars = window.getPlayerStars(p, window.activeViewMonth);
+                return star === 30 ? pStars >= 30 : pStars === star;
+            });
+            
+            let rewardHtml = '<div class="text-xs text-gray-600 italic mb-6 font-epic text-center">No rewards assigned.</div>';
+            if(rewardInfo && (rewardInfo.name || rewardInfo.name2)) {
+                if(star >= 1 && star <= 5) {
+                    rewardHtml = `
+                        <div class="bg-[#0a0b10] border border-gray-800 rounded p-4 text-left mb-6 space-y-3">
+                            <div class="text-sm font-bold text-red-500 text-center"><i class="fa-solid fa-lock text-2xl mb-2 block"></i>LOCKED</div>
+                            <div class="text-xs text-gray-400 text-center font-bold tracking-widest uppercase">Reach Star 6 to unlock</div>
+                        </div>
+                    `;
+                } else {
+                    rewardHtml = '<div class="bg-[#0a0b10] border border-gray-800 rounded p-4 text-left mb-6 space-y-3">';
+                    if(rewardInfo.name) rewardHtml += `<div><div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">MAIN REWARD</div><div class="text-sm font-bold text-white">${rewardInfo.name}</div></div>`;
+                    if(rewardInfo.name2) {
+                        if(rewardInfo.name) rewardHtml += '<div class="w-full h-px bg-gray-800 my-2"></div>';
+                        rewardHtml += `<div><div class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">EXTRA REWARD</div><div class="text-sm font-bold text-white">${rewardInfo.name2}</div></div>`;
+                    }
+                    rewardHtml += '</div>';
+                }
+            }
+
+            let playersHtml = '<div class="text-xs text-gray-600 italic font-epic text-center py-2">No champions reached this point yet.</div>';
+            if(playersHere.length > 0) {
+                playersHtml = '<div class="space-y-2 max-h-[30vh] overflow-y-auto pr-1 text-left hide-scrollbar">';
+                playersHere.forEach(p => {
+                    const pStars = window.getPlayerStars(p, window.activeViewMonth);
+                    playersHtml += `
+                        <div class="flex items-center gap-3 bg-[#0a0b10] border border-gray-800 p-2.5 rounded cursor-pointer hover:border-gray-600 transition" onclick="window.closeModal('modal-milestone'); window.showPlayerProfile('${p.id}')">
+                            <img src="${p.avatar}" class="w-8 h-8 rounded border border-gray-700 object-cover bg-black">
+                            <div class="flex-grow min-w-0">
+                                <div class="font-bold text-white text-xs truncate font-epic uppercase">${p.name}</div>
+                            </div>
+                            <div class="text-right text-[10px] font-bold text-yellow-500">${pStars} ⭐</div>
+                        </div>
+                    `;
+                });
+                playersHtml += '</div>';
+            }
+
+            const html = `
+                <div class="mb-6 text-center">
+                    <h3 class="font-epic text-2xl font-black text-white">STAR ${star === 30 ? '30+' : star}</h3>
+                </div>
+                ${rewardHtml}
+                <div class="text-left mb-2 text-[10px] font-bold text-gray-500 tracking-widest uppercase border-b border-gray-800 pb-1">CHAMPIONS AT THIS MILESTONE (${playersHere.length})</div>
+                ${playersHtml}
+            `;
+            document.getElementById('milestone-content').innerHTML = html;
+            document.getElementById('modal-milestone').classList.add('active');
         };
 
         window.addStatBox = function() { window.siteContent.stats.push({ val: "0", lbl: "NEW STAT" }); window.renderAdminPanes(); };
         window.removeStatBox = function(idx) { window.siteContent.stats.splice(idx, 1); window.renderAdminPanes(); };
         window.openScoreEditor = function(playerId, dateNum) {
-            const p = window.playersData.find(x => x.id === playerId); if(!p) return;
-            document.getElementById('edit-score-pid').value = playerId; document.getElementById('edit-score-date').value = dateNum;
+            const p = window.playersData.find(x => x.id === playerId);
+            if(!p) return;
+            document.getElementById('edit-score-pid').value = playerId;
+            document.getElementById('edit-score-date').value = dateNum;
             document.getElementById('edit-score-desc').innerText = `${p.name} - Date ${dateNum} (${window.activeViewMonth})`;
             const currentVal = (p.history && p.history[window.activeViewMonth] && p.history[window.activeViewMonth][dateNum]) ? p.history[window.activeViewMonth][dateNum] : 0;
-            const selectEl = document.getElementById('edit-score-val'); selectEl.innerHTML = '';
+            const selectEl = document.getElementById('edit-score-val');
+            selectEl.innerHTML = '';
             for(let i=0; i<=50; i++) selectEl.innerHTML += `<option value="${i}" ${i === currentVal ? 'selected' : ''}>${i}</option>`;
             document.getElementById('modal-edit-score').classList.add('active');
         };
         window.verifyAdmin = function() {
             const pin = document.getElementById('admin-pin').value;
-            if(window.validPins.includes(pin)) { window.isAdmin = true; document.getElementById('admin-pin').value = ''; window.closeModal('modal-admin'); window.switchTab('admin-dashboard'); window.setAdminTab('players'); } 
-            else window.showMessage("Auth Failed", "Incorrect Password.");
+            if(window.validPins.includes(pin)) {
+                window.isAdmin = true;
+                document.getElementById('admin-pin').value = '';
+                window.closeModal('modal-admin'); window.switchTab('admin-dashboard'); window.setAdminTab('players');
+            } else window.showMessage("Authentication Failed", "Incorrect Password.");
         };
         window.logoutAdmin = function() { window.isAdmin = false; window.switchTab('home'); };
         window.addPlayer = async function() {
@@ -1025,7 +1241,8 @@
                 const avatar = base64 || `https://placehold.co/100x100/1a1a2e/ffffff?text=${name.charAt(0)}`;
                 const newId = window.generateId();
                 await setDoc(getDocRef('players', newId), { id: newId, name, avatar, history: {}, guild_id: guildId });
-                document.getElementById('add-player-name').value = ''; if(fileInput) fileInput.value = '';
+                document.getElementById('add-player-name').value = '';
+                if(fileInput) fileInput.value = '';
             });
         };
         window.updatePlayer = async function(id, field, value) { await setDoc(getDocRef('players', id), { [field]: value }, { merge: true }); };
@@ -1038,84 +1255,250 @@
                 const logo = base64 || `https://placehold.co/100x100/1a1a2e/d4af37?text=${name.charAt(0)}`;
                 const newId = window.generateId();
                 await setDoc(getDocRef('guilds', newId), { id: newId, name, logo, totalStars: 0 });
-                document.getElementById('add-guild-name').value = ''; if(fileInput) fileInput.value = '';
+                document.getElementById('add-guild-name').value = '';
+                if(fileInput) fileInput.value = '';
             });
         };
         window.updateGuild = async function(id, field, value) { await setDoc(getDocRef('guilds', id), { [field]: value }, { merge: true }); };
-        window.deleteGuild = async function(id) { await deleteDoc(getDocRef('guilds', id)); window.playersData.forEach(async p => { if(p.guild_id === id) await setDoc(getDocRef('players', p.id), { guild_id: '' }, { merge: true }); }); };
-        window.saveReward = async function(star) { await setDoc(getDocRef('rewards', star.toString()), { star, name: document.getElementById(`rew-name-${star}`).value, name2: document.getElementById(`rew-name2-${star}`).value }, { merge: true }); };
-        window.addPin = async function() { const val = document.getElementById('add-pin-input').value; if(val && window.validPins.length < 10 && !window.validPins.includes(val)) { await setDoc(getDocRef('config', 'main'), { validPins: [...window.validPins, val] }, { merge: true }); document.getElementById('add-pin-input').value = ''; } };
-        window.removePin = async function(idx) { if(window.validPins.length > 1) { const newPins = [...window.validPins]; newPins.splice(idx, 1); await setDoc(getDocRef('config', 'main'), { validPins: newPins }, { merge: true }); } };
-        
+        window.deleteGuild = async function(id) {
+            await deleteDoc(getDocRef('guilds', id));
+            window.playersData.forEach(async p => { if(p.guild_id === id) await setDoc(getDocRef('players', p.id), { guild_id: '' }, { merge: true }); });
+        };
+        window.saveReward = async function(star) {
+            const name = document.getElementById(`rew-name-${star}`).value;
+            const desc = document.getElementById(`rew-desc-${star}`).value;
+            const name2 = document.getElementById(`rew-name2-${star}`).value;
+            const desc2 = document.getElementById(`rew-desc2-${star}`).value;
+            await setDoc(getDocRef('rewards', star.toString()), { star, name, desc, name2, desc2 }, { merge: true });
+        };
+        window.addPin = async function() {
+            const val = document.getElementById('add-pin-input').value;
+            if(val && window.validPins.length < 10 && !window.validPins.includes(val)) {
+                await setDoc(getDocRef('config', 'main'), { validPins: [...window.validPins, val] }, { merge: true });
+                document.getElementById('add-pin-input').value = '';
+            }
+        };
+        window.removePin = async function(idx) {
+            if(window.validPins.length > 1) { 
+                const newPins = [...window.validPins]; newPins.splice(idx, 1);
+                await setDoc(getDocRef('config', 'main'), { validPins: newPins }, { merge: true });
+            }
+        };
         window.saveSiteContent = async function() {
             const safeGet = (id) => document.getElementById(id)?.value || '';
             let updatedStats = [];
-            if(window.siteContent.stats) updatedStats = window.siteContent.stats.map((s, i) => ({ val: document.getElementById(`edit-stat-val-${i}`).value || '0', lbl: document.getElementById(`edit-stat-lbl-${i}`).value || 'STAT' }));
+            if(window.siteContent.stats) {
+                updatedStats = window.siteContent.stats.map((s, i) => ({ val: document.getElementById(`edit-stat-val-${i}`).value || '0', lbl: document.getElementById(`edit-stat-lbl-${i}`).value || 'STAT' }));
+            }
             const newContent = {
-                title: safeGet('edit-content-title'), loadingText: safeGet('edit-content-loading'), mapTitle: safeGet('edit-content-maptitle'), mapDesc: safeGet('edit-content-mapdesc'),
-                heroTitle: safeGet('edit-content-herotitle'), heroSub: safeGet('edit-content-herosub'), 
-                topChampionsTitle: safeGet('edit-content-champ-title'), topTeamsTitle: safeGet('edit-content-team-title'), stats: updatedStats
+                title: safeGet('edit-content-title'), mapTitle: safeGet('edit-content-maptitle'), mapDesc: safeGet('edit-content-mapdesc'),
+                heroTitle: safeGet('edit-content-herotitle'), heroSub: safeGet('edit-content-herosub'),
+                loadingText: safeGet('edit-content-loading'), topChampionsTitle: safeGet('edit-content-champ'), topTeamsTitle: safeGet('edit-content-team'),
+                stats: updatedStats
             };
             await setDoc(getDocRef('config', 'main'), { siteContent: newContent }, { merge: true });
         };
         window.saveDailyScore = async function() {
-            const pid = document.getElementById('edit-score-pid').value; const dateNum = document.getElementById('edit-score-date').value; const val = parseInt(document.getElementById('edit-score-val').value) || 0;
+            const pid = document.getElementById('edit-score-pid').value;
+            const dateNum = document.getElementById('edit-score-date').value;
+            const val = parseInt(document.getElementById('edit-score-val').value) || 0;
             const p = window.playersData.find(x => x.id === pid);
             if(p) {
-                if(!p.history) p.history = {}; if(!p.history[window.activeViewMonth]) p.history[window.activeViewMonth] = {};
+                if(!p.history) p.history = {};
+                if(!p.history[window.activeViewMonth]) p.history[window.activeViewMonth] = {};
                 p.history[window.activeViewMonth][dateNum] = val;
-                await setDoc(getDocRef('players', pid), { history: p.history }, { merge: true }); window.closeModal('modal-edit-score');
+                await setDoc(getDocRef('players', pid), { history: p.history }, { merge: true });
+                window.closeModal('modal-edit-score');
             }
         };
-        window.generatePoster = function() { /* Simplified logic exists to prevent breaking, real report generator untouched logic */ };
+
+        window.generatePoster = function() {
+            const captureArea = document.getElementById('modal-capture-area');
+            const imgPreview = document.getElementById('capture-img-preview');
+            const downloadBtn = document.getElementById('capture-download-btn');
+            
+            document.getElementById('modal-message-title').innerText = "GENERATING REPORT";
+            document.getElementById('modal-message-text').innerText = "Creating snapshot...";
+            captureArea.classList.add('hidden');
+            document.getElementById('modal-msg-ok-btn').classList.add('hidden');
+            document.getElementById('modal-message').classList.add('active');
+
+            setTimeout(() => {
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'absolute'; wrapper.style.top = '-9999px'; wrapper.style.left = '-9999px';
+                wrapper.style.width = '800px'; wrapper.style.background = '#0a0b10'; wrapper.style.padding = '40px';
+                wrapper.style.fontFamily = "'Inter', sans-serif"; wrapper.style.color = 'white';
+
+                let html = `
+                    <div style="text-align: center; border-bottom: 1px solid #374151; padding-bottom: 20px; margin-bottom: 30px;">
+                        <h1 style="font-family: 'Cinzel', serif; font-size: 36px; font-weight: 900; color: #fbbf24; margin: 0; text-transform: uppercase;">${window.siteContent.title}</h1>
+                        <p style="font-size: 14px; color: #9ca3af; letter-spacing: 4px; text-transform: uppercase; margin: 5px 0 0 0; font-weight: bold;">RANKING REPORT - ${window.activeViewMonth}</p>
+                    </div>
+                    <div style="display: flex; gap: 40px;">
+                `;
+
+                html += `<div style="flex: 1;"><h3 style="font-family: 'Cinzel', serif; color: white; font-size: 18px; margin-bottom: 15px; text-transform: uppercase;">${window.siteContent.topChampionsTitle || 'TOP CHAMPIONS'}</h3>`;
+                let sortedP = [...window.playersData].sort((a, b) => window.getPlayerStars(b, window.activeViewMonth) - window.getPlayerStars(a, window.activeViewMonth)).slice(0, 10);
+                
+                sortedP.forEach((p, i) => {
+                    const stars = window.getPlayerStars(p, window.activeViewMonth);
+                    html += `
+                        <div style="display: flex; align-items: center; background: #0f141c; border: 1px solid #1f2937; border-radius: 4px; padding: 10px; margin-bottom: 8px;">
+                            <div style="width: 25px; font-weight: bold; color: #6b7280; font-family: 'Cinzel', serif;">${i+1}</div>
+                            <img src="${p.avatar}" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover; border: 1px solid #374151; margin-right: 15px;">
+                            <div style="flex-grow: 1;">
+                                <div style="color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; font-family: 'Cinzel', serif;">${p.name}</div>
+                            </div>
+                            <div style="text-align: right; color: #fbbf24; font-weight: bold;">${stars} ⭐</div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+
+                html += `<div style="flex: 1;"><h3 style="font-family: 'Cinzel', serif; color: white; font-size: 18px; margin-bottom: 15px; text-transform: uppercase;">${window.siteContent.topTeamsTitle || 'TOP TEAMS'}</h3>`;
+                let sortedG = [...window.guildsData].sort((a, b) => (b.totalStars || 0) - (a.totalStars || 0)).slice(0, 5);
+                
+                sortedG.forEach((g, i) => {
+                    const logoImg = g.logo || `https://placehold.co/100x100/1a1a2e/d4af37?text=${g.name.charAt(0)}`;
+                    html += `
+                        <div style="display: flex; align-items: center; background: #0f141c; border: 1px solid #1f2937; border-radius: 4px; padding: 10px; margin-bottom: 8px;">
+                            <div style="width: 25px; font-weight: bold; color: #6b7280; font-family: 'Cinzel', serif;">${i+1}</div>
+                            <img src="${logoImg}" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover; border: 1px solid #374151; margin-right: 15px;">
+                            <div style="flex-grow: 1;">
+                                <div style="color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; font-family: 'Cinzel', serif;">${g.name}</div>
+                            </div>
+                            <div style="text-align: right; color: #fbbf24; font-weight: bold;">${g.totalStars || 0} ⭐</div>
+                        </div>
+                    `;
+                });
+                html += `</div></div>`;
+
+                wrapper.innerHTML = html;
+                document.body.appendChild(wrapper);
+
+                try {
+                    html2canvas(wrapper, { backgroundColor: "#0a0b10", scale: 2, useCORS: true, allowTaint: true, logging: false }).then(canvas => {
+                        document.body.removeChild(wrapper);
+                        const imgData = canvas.toDataURL("image/png");
+                        imgPreview.src = imgData;
+                        downloadBtn.href = imgData;
+                        downloadBtn.download = `MoraRepublic_Report_${window.activeViewMonth}.png`;
+                        
+                        document.getElementById('modal-message-title').innerText = "REPORT READY";
+                        document.getElementById('modal-message-text').innerText = "Save image below.";
+                        captureArea.classList.remove('hidden');
+                        document.getElementById('modal-msg-ok-btn').classList.remove('hidden');
+                    }).catch(err => {
+                        if(document.body.contains(wrapper)) document.body.removeChild(wrapper);
+                        document.getElementById('modal-message-title').innerText = "ERROR";
+                        document.getElementById('modal-message-text').innerText = "Failed to capture image.";
+                        document.getElementById('modal-msg-ok-btn').classList.remove('hidden');
+                    });
+                } catch(err) {
+                    if(document.body.contains(wrapper)) document.body.removeChild(wrapper);
+                    document.getElementById('modal-message-title').innerText = "ERROR";
+                    document.getElementById('modal-message-text').innerText = "Library error.";
+                    document.getElementById('modal-msg-ok-btn').classList.remove('hidden');
+                }
+            }, 500);
+        };
 
         document.getElementById('loading-screen').classList.remove('hidden');
 
         signInAnonymously(auth).then(() => {
-            onSnapshot(getColRef('players'), (snap) => { window.playersData = snap.docs.map(doc => doc.data()); window.renderAll(); }, (err) => console.error(err));
-            onSnapshot(getColRef('guilds'), (snap) => { window.guildsData = snap.docs.map(doc => doc.data()); window.renderAll(); }, (err) => console.error(err));
-            onSnapshot(getColRef('rewards'), (snap) => {
-                window.rewardsData = snap.docs.map(doc => doc.data());
-                if(snap.empty) { for(let i=0; i<=30; i++) setDoc(getDocRef('rewards', i.toString()), { star: i, name: i === 10 || i === 20 || i === 30 ? `Gold Chest Lvl ${i}` : (i >= 5 ? `Silver Chest` : ""), name2: i === 30 ? "Exclusive Avatar Frame" : "" }); }
+            onSnapshot(getColRef('players'), (snap) => {
+                window.playersData = snap.docs.map(doc => doc.data());
                 window.renderAll();
             }, (err) => console.error(err));
+
+            onSnapshot(getColRef('guilds'), (snap) => {
+                window.guildsData = snap.docs.map(doc => doc.data());
+                window.renderAll();
+            }, (err) => console.error(err));
+
+            onSnapshot(getColRef('rewards'), (snap) => {
+                window.rewardsData = snap.docs.map(doc => doc.data());
+                window.renderAll();
+            }, (err) => console.error(err));
+
             onSnapshot(getDocRef('config', 'main'), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     if (data.siteContent) window.siteContent = data.siteContent;
                     if(data.validPins) window.validPins = data.validPins;
-                } else setDoc(getDocRef('config', 'main'), { siteContent: window.siteContent, validPins: window.validPins });
-                window.renderAll(); document.getElementById('loading-screen').classList.add('hidden');
+                } else {
+                    setDoc(getDocRef('config', 'main'), { siteContent: window.siteContent, validPins: window.validPins });
+                }
+                window.renderAll();
+                document.getElementById('loading-screen').classList.add('hidden');
             }, (err) => console.error(err));
-        }).catch(err => { console.error("Firebase Error:", err); window.showMessage("DB Error", "Connection failed."); document.getElementById('loading-screen').classList.add('hidden'); });
 
-        // 3D Background
+        }).catch(err => {
+            console.error("Firebase Error:", err);
+            window.showMessage("Database Error", "Connection failed.");
+            document.getElementById('loading-screen').classList.add('hidden');
+        });
+
         const canvas = document.getElementById('webgl-bg');
-        const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x0a0b10, 0.002);
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); camera.position.z = 50;
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: false });
-        renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0a0b10, 0.002);
 
-        const particlesGeometry = new THREE.BufferGeometry(); const particlesCount = 800;
-        const posArray = new Float32Array(particlesCount * 3); const sizeArray = new Float32Array(particlesCount);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 50;
+
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 800;
+        const posArray = new Float32Array(particlesCount * 3);
+        const sizeArray = new Float32Array(particlesCount);
+
         for(let i = 0; i < particlesCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 200; 
-        for(let i = 0; i < particlesCount; i++) sizeArray[i] = Math.random() * 2;
+        for(let i=0; i< particlesCount; i++) sizeArray[i] = Math.random() * 2;
+
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
         particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizeArray, 1));
-        const particleMaterial = new THREE.PointsMaterial({ size: 0.8, color: 0x9ca3af, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
-        const particlesMesh = new THREE.Points(particlesGeometry, particleMaterial); scene.add(particlesMesh);
 
-        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        const particleMaterial = new THREE.PointsMaterial({
+            size: 0.8, color: 0x9ca3af, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending
+        });
 
-        let mouseX = 0; let mouseY = 0;
-        document.addEventListener('mousemove', (event) => { mouseX = (event.clientX - window.innerWidth / 2) * 0.0005; mouseY = (event.clientY - window.innerHeight / 2) * 0.0005; });
+        const particlesMesh = new THREE.Points(particlesGeometry, particleMaterial);
+        scene.add(particlesMesh);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        let mouseX = 0;
+        let mouseY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX) * 0.0005;
+            mouseY = (event.clientY - windowHalfY) * 0.0005;
+        });
+
         const clock = new THREE.Clock();
+
         function animate() {
             requestAnimationFrame(animate);
-            particlesMesh.rotation.y += 0.001; particlesMesh.rotation.x += 0.0005;
-            camera.position.x += (mouseX - camera.position.x) * 0.05; camera.position.y += (-mouseY - camera.position.y) * 0.05; camera.lookAt(scene.position);
+            particlesMesh.rotation.y += 0.001;
+            particlesMesh.rotation.x += 0.0005;
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
             const positions = particlesMesh.geometry.attributes.position.array;
-            for(let i = 1; i < particlesCount * 3; i += 3) { positions[i] += 0.05; if(positions[i] > 100) positions[i] = -100; }
+            for(let i = 1; i < particlesCount * 3; i += 3) {
+                positions[i] += 0.05;
+                if(positions[i] > 100) positions[i] = -100;
+            }
             particlesMesh.geometry.attributes.position.needsUpdate = true;
             renderer.render(scene, camera);
         }
