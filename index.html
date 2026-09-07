@@ -602,6 +602,30 @@
         window.getRankInfo = function(stars) { return rankSystem.find(r => stars >= r.min && stars <= r.max) || rankSystem[rankSystem.length - 1]; };
         window.generateId = function() { return Math.random().toString(36).substr(2, 9); };
         
+        // Helper to extract numbers from currency strings (e.g. "Rp 50.000" -> 50000)
+        window.parseCurrencyValue = function(str) {
+            if (!str) return 0;
+            const numStr = str.replace(/[^\d]/g, '');
+            return parseInt(numStr, 10) || 0;
+        };
+
+        // Helper to calculate total rewards specifically at the player's current star level
+        window.calculateAccumulatedRewards = function(stars) {
+            let total = 0;
+            const reward = window.rewardsData.find(r => r.star === stars);
+            if (reward) {
+                total += window.parseCurrencyValue(reward.name); // INSENTIF SA
+                total += window.parseCurrencyValue(reward.name2); // INSENTIF UPRESS
+            }
+            return total;
+        };
+
+        // Helper to format numbers back to currency string
+        window.formatCurrency = function(amount) {
+            if (amount === 0) return "-";
+            return "Rp " + amount.toLocaleString('id-ID');
+        };
+
         window.changeMonth = function() {
             window.activeViewMonth = document.getElementById('global-month').value;
             window.renderAll();
@@ -762,6 +786,16 @@
                     const rankInfo = window.getRankInfo(pStars);
                     const guild = window.guildsData.find(g => g.id === p.guild_id);
                     const rankNum = index + 1;
+                    const accReward = window.calculateAccumulatedRewards(pStars);
+                    
+                    let rewardHtml = 'No Rewards';
+                    if (accReward > 0) {
+                        if (pStars >= 1 && pStars <= 5) {
+                            rewardHtml = `<span class="text-gray-500"><i class="fa-solid fa-lock text-red-500 mr-1"></i>Tot: ${window.formatCurrency(accReward)}</span>`;
+                        } else {
+                            rewardHtml = `<i class="fa-solid fa-coins mr-1"></i>Tot: ${window.formatCurrency(accReward)}`;
+                        }
+                    }
                     
                     let medal = `<div class="w-10 h-10 flex items-center justify-center font-epic font-bold text-gray-500 text-lg">${rankNum}</div>`;
                     if(rankNum === 1) medal = `<div class="w-10 h-10 flex items-center justify-center font-epic text-yellow-400 text-2xl drop-shadow-[0_0_5px_currentColor]"><i class="fa-solid fa-crown"></i></div>`;
@@ -775,6 +809,7 @@
                             <div class="flex-grow min-w-0">
                                 <div class="font-bold text-base text-white truncate font-epic uppercase">${p.name}</div>
                                 <div class="text-[10px] text-gray-400 truncate uppercase tracking-widest">${guild ? guild.name : 'Independent'} • <span class="${rankInfo.colorClass}">${rankInfo.name.replace(/ /g,'')}</span></div>
+                                <div class="text-[9px] text-yellow-500/80 mt-0.5 font-bold tracking-widest">${rewardHtml}</div>
                             </div>
                             <div class="text-right">
                                 <div class="font-bold text-xl text-yellow-500">${pStars} <span class="text-sm text-gray-600">⭐</span></div>
@@ -830,12 +865,16 @@
                     const pStars = window.getPlayerStars(p, window.activeViewMonth);
                     const guild = window.guildsData.find(g => g.id === p.guild_id);
                     const rankInfo = window.getRankInfo(pStars);
-                    const rewardInfo = window.rewardsData.find(r => r.star === pStars);
                     
-                    let rewardText = 'No Reward';
-                    if (rewardInfo && (rewardInfo.name || rewardInfo.name2)) {
-                        if (pStars >= 1 && pStars <= 5) rewardText = '<i class="fa-solid fa-lock text-red-500"></i> Locked';
-                        else rewardText = `<i class="fa-solid fa-gift text-yellow-500"></i> ${rewardInfo.name || rewardInfo.name2}`;
+                    const accReward = window.calculateAccumulatedRewards(pStars);
+                    
+                    let rewardHtml = 'No Reward';
+                    if (accReward > 0) {
+                        if (pStars >= 1 && pStars <= 5) {
+                            rewardHtml = `<span class="text-gray-500"><i class="fa-solid fa-lock text-red-500 mr-1"></i>${window.formatCurrency(accReward)}</span>`;
+                        } else {
+                            rewardHtml = `<i class="fa-solid fa-coins mr-1"></i>${window.formatCurrency(accReward)}`;
+                        }
                     }
 
                     return `
@@ -848,7 +887,7 @@
                             </div>
                             <div class="text-right flex flex-col items-end">
                                 <div class="font-bold text-sm text-yellow-500">${pStars} ⭐</div>
-                                <div class="text-[8px] text-gray-400 mt-1 uppercase tracking-widest truncate max-w-[80px]">${rewardText}</div>
+                                <div class="text-[8px] text-yellow-500/80 mt-1 uppercase font-bold tracking-widest truncate max-w-[100px]">${rewardHtml}</div>
                             </div>
                         </div>
                     `;
@@ -906,7 +945,7 @@
                             const isToday = isCurrentMonth && i === todayDate;
                             let cellClass = val > 0 ? "bg-yellow-900/20 text-yellow-500 font-bold" : "text-gray-700";
                             if (val === 0 && isToday) cellClass = "bg-blue-900/20 text-blue-300/50";
-                            rows += `<td class="p-1 border border-gray-800 text-center cursor-pointer hover:bg-gray-800 transition ${cellClass}" onclick="window.openScoreEditor('${p.id}', ${i})">${val > 0 ? val : '-'}</td>`;
+                            rows += `<td class="p-0 border border-gray-800 text-center cursor-pointer hover:bg-gray-800 transition ${cellClass}" onclick="window.openScoreEditor('${p.id}', ${i})"><div class="w-full h-full p-1 flex items-center justify-center">${val > 0 ? val : '-'}</div></td>`;
                         }
                         rows += `</tr>`;
                     });
@@ -1136,12 +1175,16 @@
                 members.forEach((m, index) => {
                     const mStars = window.getPlayerStars(m, window.activeViewMonth);
                     const mRankInfo = window.getRankInfo(mStars);
-                    const mReward = window.rewardsData.find(r => r.star === mStars);
+                    
+                    const accReward = window.calculateAccumulatedRewards(mStars);
                     let mRewardText = 'No Reward';
                     
-                    if(mReward && (mReward.name || mReward.name2)) {
-                        if (mStars >= 1 && mStars <= 5) mRewardText = '<i class="fa-solid fa-lock text-red-500"></i> Locked';
-                        else mRewardText = `<i class="fa-solid fa-gift text-yellow-500"></i> ${mReward.name || mReward.name2}`;
+                    if(accReward > 0) {
+                        if (mStars >= 1 && mStars <= 5) {
+                            mRewardText = `<span class="text-gray-500"><i class="fa-solid fa-lock text-red-500 mr-1"></i>${window.formatCurrency(accReward)}</span>`;
+                        } else {
+                            mRewardText = `<i class="fa-solid fa-coins text-yellow-500 mr-1"></i>${window.formatCurrency(accReward)}`;
+                        }
                     }
 
                     html += `
@@ -1154,7 +1197,7 @@
                             </div>
                             <div class="text-right flex flex-col items-end">
                                 <div class="text-xs font-bold text-yellow-500">${mStars} ⭐</div>
-                                <div class="text-[8px] text-gray-400 mt-1 uppercase tracking-widest truncate max-w-[80px]">${mRewardText}</div>
+                                <div class="text-[8px] text-gray-400 mt-1 uppercase tracking-widest truncate max-w-[100px]">${mRewardText}</div>
                             </div>
                         </div>
                     `;
