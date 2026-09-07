@@ -280,7 +280,7 @@
             <h2 id="loading-text" class="font-epic text-2xl md:text-3xl font-bold text-yellow-500 animate-pulse tracking-widest">JADILAH AE TERBAIK!!!</h2>
         </div>
 
-        <section id="sec-home" class="h-full overflow-y-auto p-6 md:p-12 pb-20 absolute w-full block">
+        <section id="sec-home" class="h-full overflow-y-auto p-6 md:p-12 pb-20 pt-24 md:pt-32 absolute w-full block">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center py-10 md:py-20 relative z-10">
                 <div class="w-full md:w-1/2 text-left space-y-6 md:pr-10">
                     <p class="text-xs text-gray-400 tracking-[0.2em] uppercase font-bold">COMPETITIVE TRACKER</p>
@@ -327,15 +327,15 @@
             </div>
         </section>
 
-        <section id="sec-map" class="h-full w-full hidden absolute overflow-hidden">
-            <div class="absolute top-6 left-6 z-20 pointer-events-none">
+        <section id="sec-map" class="h-full w-full hidden absolute overflow-hidden pt-20">
+            <div class="absolute top-24 left-6 z-20 pointer-events-none">
                 <div class="epic-panel px-5 py-4 rounded border-l-4 border-yellow-500">
                     <h2 class="font-epic text-base md:text-lg font-bold text-yellow-500" id="map-title">JOURNEY MAP</h2>
                     <p class="text-[10px] md:text-xs text-gray-400 font-bold uppercase mt-1" id="map-desc">Reach 30 stars to unlock IMMORTAL.</p>
                 </div>
             </div>
 
-            <div id="map-container" class="absolute inset-0 h-full w-full overflow-y-auto overflow-x-hidden hide-scrollbar scroll-smooth">
+            <div id="map-container" class="absolute inset-0 h-full w-full overflow-y-auto overflow-x-hidden hide-scrollbar scroll-smooth pt-20">
                 <div id="map-content" class="relative w-full min-h-max max-w-lg mx-auto flex flex-col items-center pt-32 pb-40">
                     <div id="map-line" class="absolute top-0 bottom-0 w-[2px] bg-gray-800 left-1/2 -translate-x-1/2 z-0"></div>
                     <div id="map-nodes" class="w-full flex flex-col justify-end gap-20 md:gap-28 relative z-10 pt-16 overflow-hidden md:overflow-visible">
@@ -345,7 +345,7 @@
             </div>
         </section>
 
-        <section id="sec-leaderboard" class="h-full w-full hidden absolute overflow-y-auto p-4 md:p-8 pb-20">
+        <section id="sec-leaderboard" class="h-full w-full hidden absolute overflow-y-auto p-4 md:p-8 pb-20 pt-24 md:pt-32">
             <div class="max-w-4xl mx-auto space-y-8 relative z-10 mt-8">
                 <div class="flex justify-center gap-4">
                     <button id="btn-lb-players" onclick="setLbTab('players')" class="epic-btn px-8 py-2.5 text-sm">CHAMPIONS</button>
@@ -363,7 +363,7 @@
             </div>
         </section>
 
-        <section id="sec-admin-dashboard" class="h-full w-full hidden absolute overflow-y-auto p-4 pb-20">
+        <section id="sec-admin-dashboard" class="h-full w-full hidden absolute overflow-y-auto p-4 pb-20 pt-24 md:pt-32">
             <div class="max-w-6xl mx-auto space-y-6 relative z-10 mt-4">
                 <div class="flex justify-between items-center epic-panel p-5 rounded border-t-2 border-t-red-600">
                     <div>
@@ -1053,7 +1053,7 @@
 
             let extraMessage = '';
             if (pStars >= 12 && pStars < 20) {
-                extraMessage = `<div class="text-[10px] text-blue-400 mt-2 font-bold uppercase tracking-widest bg-blue-900/20 p-2 rounded border border-blue-800/50">Kejar level 12 ini tiap bulanya dan dapatkan Insentif UPRES 3 bulanan.</div>`;
+                extraMessage = `<div class="text-[10px] text-blue-400 mt-2 font-bold uppercase tracking-widest bg-blue-900/20 p-2 rounded border border-blue-800/50">Kejar level ini tiap bulanya dan dapatkan Insentif UPRES 3 bulanan.</div>`;
             } else if (pStars >= 20) {
                 extraMessage = `<div class="text-[10px] text-green-400 mt-2 font-bold uppercase tracking-widest bg-green-900/20 p-2 rounded border border-green-800/50">Pasti dapat Insentif UPRES 3 bulanan.</div>`;
             }
