@@ -1463,40 +1463,83 @@
             }, 500);
         };
 
-        document.getElementById('loading-screen').classList.remove('hidden');
+        const loadingScreen = document.getElementById('loading-screen');
+        loadingScreen.classList.remove('hidden');
+
+        let loadingFinished = false;
+        const finishLoading = () => {
+            if (loadingFinished) return;
+            loadingFinished = true;
+            clearTimeout(loadingTimeout);
+            loadingScreen.classList.add('hidden');
+        };
+
+        // Failsafe: prevent an endless loading screen if Firebase never responds.
+        const loadingTimeout = setTimeout(() => {
+            finishLoading();
+            console.error("Firebase loading timed out.");
+            window.showMessage(
+                "Koneksi Bermasalah",
+                "Data belum berhasil dimuat dari Firebase. Periksa koneksi internet, konfigurasi Firebase, dan Firestore Rules, lalu muat ulang halaman."
+            );
+        }, 15000);
 
         signInAnonymously(auth).then(() => {
             onSnapshot(getColRef('players'), (snap) => {
-                window.playersData = snap.docs.map(doc => doc.data());
+                window.playersData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
                 window.renderAll();
-            }, (err) => console.error(err));
+            }, (err) => {
+                console.error("Firebase players error:", err);
+                finishLoading();
+                window.showMessage("Database Error", "Data pemain gagal dimuat. Periksa izin Firestore.");
+            });
 
             onSnapshot(getColRef('guilds'), (snap) => {
-                window.guildsData = snap.docs.map(doc => doc.data());
+                window.guildsData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
                 window.renderAll();
-            }, (err) => console.error(err));
+            }, (err) => {
+                console.error("Firebase guilds error:", err);
+                finishLoading();
+                window.showMessage("Database Error", "Data tim gagal dimuat. Periksa izin Firestore.");
+            });
 
             onSnapshot(getColRef('rewards'), (snap) => {
-                window.rewardsData = snap.docs.map(doc => doc.data());
+                window.rewardsData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
                 window.renderAll();
-            }, (err) => console.error(err));
+            }, (err) => {
+                console.error("Firebase rewards error:", err);
+                finishLoading();
+                window.showMessage("Database Error", "Data reward gagal dimuat. Periksa izin Firestore.");
+            });
 
-            onSnapshot(getDocRef('config', 'main'), (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.siteContent) window.siteContent = data.siteContent;
-                    if(data.validPins) window.validPins = data.validPins;
-                } else {
-                    setDoc(getDocRef('config', 'main'), { siteContent: window.siteContent, validPins: window.validPins });
+            onSnapshot(getDocRef('config', 'main'), async (docSnap) => {
+                try {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data.siteContent) window.siteContent = data.siteContent;
+                        if (data.validPins) window.validPins = data.validPins;
+                    } else {
+                        await setDoc(getDocRef('config', 'main'), {
+                            siteContent: window.siteContent,
+                            validPins: window.validPins
+                        });
+                    }
+                    window.renderAll();
+                } catch (err) {
+                    console.error("Firebase config processing error:", err);
+                    window.showMessage("Database Error", "Konfigurasi website gagal diproses. Periksa izin baca/tulis Firestore.");
+                } finally {
+                    finishLoading();
                 }
-                window.renderAll();
-                document.getElementById('loading-screen').classList.add('hidden');
-            }, (err) => console.error(err));
-
+            }, (err) => {
+                console.error("Firebase config error:", err);
+                finishLoading();
+                window.showMessage("Database Error", "Konfigurasi gagal dimuat. Periksa koneksi Firebase dan Firestore Rules.");
+            });
         }).catch(err => {
-            console.error("Firebase Error:", err);
-            window.showMessage("Database Error", "Connection failed.");
-            document.getElementById('loading-screen').classList.add('hidden');
+            console.error("Firebase authentication error:", err);
+            finishLoading();
+            window.showMessage("Database Error", "Login Firebase gagal. Pastikan Anonymous Authentication aktif pada Firebase.");
         });
 
         const canvas = document.getElementById('webgl-bg');
