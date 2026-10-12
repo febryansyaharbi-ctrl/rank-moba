@@ -1,0 +1,53 @@
+.mon-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
+.mon-eyebrow{font-size:10px;letter-spacing:3px;color:#d4af37;margin-bottom:8px}
+.mon-heading h2{font-size:clamp(22px,3vw,36px);font-weight:900;color:#fff}
+.mon-heading h2 span{color:#e8c867}
+.mon-heading p:not(.mon-eyebrow){color:#9ba4b4;font-size:12px;margin-top:8px}
+.mon-public{font-size:10px;letter-spacing:1px;border:1px solid #395347;border-radius:20px;padding:8px 12px;color:#a5e4c2;white-space:nowrap}
+.mon-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:18px}
+.mon-controls label{display:grid;gap:6px;font-size:11px;color:#adb7c6}
+.mon-controls input,.mon-controls select,.mon-controls button{background:#10151f;color:#eef2f7;border:1px solid #354052;border-radius:8px;padding:10px;font-size:13px;color-scheme:dark}
+.mon-controls button{border-color:#8c743b;color:#e8c867}
+#mon-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.mon-card{background:linear-gradient(130deg,#1b2230,#10141d);border:1px solid #353d4b;border-top:2px solid #ac8d42;padding:18px;border-radius:12px}
+.mon-card>span{font-size:10px;letter-spacing:1px;color:#b4bdca}
+.mon-card strong{display:block;font-size:32px;font-weight:800;color:#f3d58b;margin:8px 0}
+.mon-card small{font-size:11px;color:#a9b3c3}
+#mon-status{font-size:12px;color:#afbacb;margin:10px 0 14px}
+.mon-scroll{border:1px solid #354052;border-radius:12px;overflow:auto;max-height:62vh;background:#0e131c}
+#mon-table{border-collapse:separate;border-spacing:0;min-width:100%;font-size:12px;text-align:center;color:#e8edf6}
+#mon-table th,#mon-table td{border-right:1px solid #263042;border-bottom:1px solid #263042;min-width:106px;padding:0}
+#mon-table thead th{position:sticky;top:0;z-index:3;background:#181f2d;height:56px;color:#aebacc}
+#mon-table small{display:block;font-size:10px;font-weight:400;margin-top:4px;color:#98a7bc}
+#mon-table .mon-name{position:sticky;left:0;z-index:2;background:#121925;min-width:190px;max-width:240px;text-align:left;padding:12px;overflow-wrap:anywhere}
+#mon-table thead .mon-name{z-index:4}
+.mon-team-row .mon-name,.mon-team-row td{background:#27251e!important}
+.mon-team-row .mon-name{color:#f1d58d}
+.mon-team-row .mon-name button{font-weight:800}
+.mon-player-row .mon-name span{padding-left:14px}
+#mon-table button{width:100%;text-align:inherit}
+#mon-table .mon-cell button{padding:10px 8px;text-align:center;min-height:84px}
+#mon-table .mon-cell strong{display:block;font-size:19px}
+#mon-table .mon-cell span{display:block;font-size:11px;margin-top:6px}
+#mon-table .mon-total{font-size:18px;font-weight:800;padding:8px}
+#mon-table .mon-selected{box-shadow:inset 2px 0 #9c7c35,inset -2px 0 #9c7c35;background:#202331}
+#mon-table .mon-future{opacity:.6}
+.mon-positive,.mon-card .mon-positive{color:#7ee2b0}
+.mon-negative,.mon-card .mon-negative{color:#ff9999}
+.mon-neutral{color:#abb8cd}
+.mon-guide{padding:16px 0;color:#a8b4c6;font-size:12px;line-height:1.9}
+.mon-guide>b:first-child{color:#d9bb70;margin-right:12px}
+.mon-guide span{color:#d1d9e5;margin-left:12px}
+#sec-monitoring button:focus-visible,#sec-monitoring input:focus-visible,#sec-monitoring select:focus-visible{outline:2px solid #f1cf77;outline-offset:2px}
+#mon-table tr:hover td{filter:brightness(1.12)}
+@media(max-width:700px){#mon-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.mon-card{padding:12px}
+.mon-card strong{font-size:26px}
+.mon-heading{align-items:start;flex-direction:column}
+.mon-public{font-size:9px}
+#mon-table .mon-name{min-width:130px;max-width:150px}
+.mon-controls label{flex:1;min-width:120px}
+.mon-controls input,.mon-controls select{width:100%}
+.mon-scroll{max-height:58vh}
+}
+

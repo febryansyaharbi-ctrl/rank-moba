@@ -123,7 +123,10 @@
             color: white !important;
         }
         input:focus, select:focus { border-color: var(--gold-primary) !important; }
+
+
     </style>
+    <link rel="stylesheet" href="./monitoring.css">
 </head>
 <body class="antialiased flex flex-col h-screen overflow-hidden">
     
@@ -143,7 +146,7 @@
                 history.pushState({tab: tabId}, '', '#' + tabId);
             }
             
-            ['home', 'map', 'leaderboard', 'admin-dashboard'].forEach(t => {
+            ['home', 'map', 'leaderboard', 'monitoring', 'admin-dashboard'].forEach(t => {
                 const el = document.getElementById(`sec-${t}`);
                 if(el) el.classList.add('hidden');
                 
@@ -240,6 +243,7 @@
             <button onclick="switchTab('home')" class="nav-btn active hover:text-white" id="tab-home">HOME</button>
             <button onclick="switchTab('map')" class="nav-btn hover:text-white" id="tab-map">JOURNEY</button>
             <button onclick="switchTab('leaderboard')" class="nav-btn hover:text-white" id="tab-leaderboard">RANK</button>
+            <button onclick="switchTab('monitoring')" class="nav-btn hover:text-white" id="tab-monitoring">MONITORING</button>
         </div>
 
         <div class="flex gap-4 items-center">
@@ -264,6 +268,7 @@
         <button onclick="switchTab('home'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 hover:text-yellow-500 transition">HOME</button>
         <button onclick="switchTab('map'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 hover:text-yellow-500 transition">JOURNEY</button>
         <button onclick="switchTab('leaderboard'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 hover:text-yellow-500 transition">RANK</button>
+        <button onclick="switchTab('monitoring'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 hover:text-yellow-500 transition">MONITORING</button>
         <button onclick="window.generatePoster(); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full text-center py-2 text-yellow-500 transition">CAPTURE</button>
         <div class="w-full text-center py-2 border-t border-gray-800 flex justify-center mt-2 pt-4">
             <div class="flex items-center gap-2 bg-black/50 border border-gray-700 px-3 py-1.5 rounded">
@@ -361,6 +366,21 @@
                     <!-- Injected via JS -->
                 </div>
             </div>
+        </section>
+
+        <section id="sec-monitoring" class="h-full w-full hidden absolute overflow-y-auto p-4 md:p-8 pb-20 pt-24 md:pt-32">
+            <div class="mon-heading"><div><p class="mon-eyebrow">PUBLIC PERFORMANCE TRACKER</p><h2 class="font-epic">MONITORING <span>TABEL</span></h2><p id="mon-comparison"></p></div><span class="mon-public">● TERBUKA UNTUK SEMUA</span></div>
+            <div class="mon-controls">
+                <label>Bulan<input id="mon-month" type="month"></label>
+                <label>Tim<select id="mon-team"><option value="">Semua tim</option></select></label>
+                <label>Cari pemain<input id="mon-search" type="search" placeholder="Nama pemain…"></label>
+                <label>Fokus tanggal<input id="mon-date" type="number" min="1" max="31" value="1"></label>
+                <button id="mon-fold" type="button">Buka / tutup tim</button>
+            </div>
+            <div id="mon-summary"></div>
+            <p id="mon-status" role="status"></p>
+            <div class="mon-scroll" tabindex="0" role="region" aria-label="Tabel monitoring, geser untuk melihat tanggal lainnya"><table id="mon-table"></table></div>
+            <div class="mon-guide"><b>CARA MEMBACA</b> Saldo kemarin + poin hari ini − lawan tanggal yang sama bulan lalu = saldo hari ini. <span>▲ Unggul · ● Impas · ▼ Tertinggal</span><br>Contoh: −3 + 8 − 4 = <b>+1</b>. Ketuk sel untuk target impas dan unggul. Saldo direset ke 0 setiap awal bulan. Tanggal tanpa pasangan bulan lalu memakai lawan 0.</div>
         </section>
 
         <section id="sec-admin-dashboard" class="h-full w-full hidden absolute overflow-y-auto p-4 pb-20 pt-24 md:pt-32">
@@ -533,6 +553,7 @@
         </div>
     </div>
 
+    <script src="./monitoring.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
@@ -555,6 +576,7 @@
         const getDocRef = (col, id) => doc(db, 'artifacts', appId, 'public', 'data', col, id);
         const getColRef = (col) => collection(db, 'artifacts', appId, 'public', 'data', col);
 
+        window.monitoringLoadState = { players: 'loading', guilds: 'loading' };
         window.playersData = [];
         window.guildsData = []; 
         window.rewardsData = [];
@@ -655,6 +677,7 @@
                 if(window.activeTab === 'map') window.renderMap();
                 if(window.activeTab === 'leaderboard') window.renderLeaderboard();
                 if(window.activeTab === 'home') window.renderHome();
+                if(window.activeTab === 'monitoring') window.renderMonitoring();
                 if(window.isAdmin) window.renderAdminPanes();
             } catch(e) { console.error("Render Error:", e); }
         };
@@ -1486,18 +1509,24 @@
 
         signInAnonymously(auth).then(() => {
             onSnapshot(getColRef('players'), (snap) => {
+                window.monitoringLoadState.players = 'ready';
                 window.playersData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
                 window.renderAll();
             }, (err) => {
+                window.monitoringLoadState.players = 'error';
+                if(window.activeTab === 'monitoring') window.renderMonitoring();
                 console.error("Firebase players error:", err);
                 finishLoading();
                 window.showMessage("Database Error", "Data pemain gagal dimuat. Periksa izin Firestore.");
             });
 
             onSnapshot(getColRef('guilds'), (snap) => {
+                window.monitoringLoadState.guilds = 'ready';
                 window.guildsData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
                 window.renderAll();
             }, (err) => {
+                window.monitoringLoadState.guilds = 'error';
+                if(window.activeTab === 'monitoring') window.renderMonitoring();
                 console.error("Firebase guilds error:", err);
                 finishLoading();
                 window.showMessage(
@@ -1540,6 +1569,8 @@
                 window.showMessage("Database Error", "Konfigurasi gagal dimuat. Periksa koneksi Firebase dan Firestore Rules.");
             });
         }).catch(err => {
+            window.monitoringLoadState = { players: 'error', guilds: 'error' };
+            if(window.activeTab === 'monitoring') window.renderMonitoring();
             console.error("Firebase authentication error:", err);
             finishLoading();
             window.showMessage("Database Error", "Login Firebase gagal. Pastikan Anonymous Authentication aktif pada Firebase.");
