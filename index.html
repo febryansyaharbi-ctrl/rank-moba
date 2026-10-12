@@ -558,7 +558,9 @@
         window.playersData = [];
         window.guildsData = []; 
         window.rewardsData = [];
-        window.validPins = ['1234'];
+        // Never enable an administrator PIN before the server configuration loads.
+        window.validPins = [];
+        window.configReady = false;
         
         const today = new Date();
         const currentRealMonth = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
@@ -1284,6 +1286,10 @@
             document.getElementById('modal-edit-score').classList.add('active');
         };
         window.verifyAdmin = function() {
+            if (!window.configReady || window.validPins.length === 0) {
+                window.showMessage("Admin Belum Tersedia", "Konfigurasi admin belum berhasil dimuat. Hubungi pengelola website.");
+                return;
+            }
             const pin = document.getElementById('admin-pin').value;
             if(window.validPins.includes(pin)) {
                 window.isAdmin = true;
@@ -1466,83 +1472,112 @@
         const loadingScreen = document.getElementById('loading-screen');
         loadingScreen.classList.remove('hidden');
 
-        let loadingFinished = false;
+        // Configuration is optional for viewing; rankings must still report read failures.
+        const pendingLoads = new Set(['players', 'guilds', 'rewards', 'config']);
+        const loadErrors = new Map();
+        const statusPanel = document.createElement('div');
+        statusPanel.id = 'database-status';
+        statusPanel.className = 'hidden fixed bottom-4 left-4 right-4 z-50 rounded border border-yellow-700 bg-gray-900 p-3 text-sm text-yellow-200 shadow-xl';
+        statusPanel.setAttribute('role', 'status');
+        const statusText = document.createElement('p');
+        const retryButton = document.createElement('button');
+        retryButton.textContent = 'Muat ulang';
+        retryButton.className = 'mt-2 underline font-bold';
+        retryButton.onclick = () => window.location.reload();
+        statusPanel.append(statusText, retryButton);
+        document.body.appendChild(statusPanel);
+
+        const updateLoadStatus = () => {
+            statusText.textContent = Array.from(loadErrors.values()).join(' ');
+            statusPanel.classList.toggle('hidden', loadErrors.size === 0);
+        };
         const finishLoading = () => {
-            if (loadingFinished) return;
-            loadingFinished = true;
             clearTimeout(loadingTimeout);
             loadingScreen.classList.add('hidden');
         };
-
-        // Failsafe: prevent an endless loading screen if Firebase never responds.
+        const settleLoad = (name) => {
+            pendingLoads.delete(name);
+            loadErrors.delete('timeout');
+            updateLoadStatus();
+            if (pendingLoads.size === 0) finishLoading();
+        };
+        const loadFailed = (name, label, err) => {
+            console.error(`Firebase ${name} error:`, err);
+            const code = err.code || 'unknown';
+            const hint = code === 'permission-denied'
+                ? 'Akses ditolak oleh Firestore Rules. Pengelola perlu memeriksa izin baca database.'
+                : code === 'unavailable'
+                    ? 'Layanan database belum terhubung. Periksa koneksi lalu muat ulang.'
+                    : 'Periksa konfigurasi Firebase dan koneksi, lalu muat ulang.';
+            loadErrors.set(name, `${label} gagal dimuat (${code}). ${hint}`);
+            settleLoad(name);
+        };
         const loadingTimeout = setTimeout(() => {
+            loadErrors.set('timeout', 'Data belum selesai dimuat: ' + Array.from(pendingLoads).join(', ') + '. Periksa koneksi lalu muat ulang.');
+            updateLoadStatus();
             finishLoading();
-            console.error("Firebase loading timed out.");
-            window.showMessage(
-                "Koneksi Bermasalah",
-                "Data belum berhasil dimuat dari Firebase. Periksa koneksi internet, konfigurasi Firebase, dan Firestore Rules, lalu muat ulang halaman."
-            );
         }, 15000);
 
+        // Render the built-in presentation even if optional config cannot be read.
+        window.renderAll();
         signInAnonymously(auth).then(() => {
-            onSnapshot(getColRef('players'), (snap) => {
-                window.playersData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-                window.renderAll();
-            }, (err) => {
-                console.error("Firebase players error:", err);
-                finishLoading();
-                window.showMessage("Database Error", "Data pemain gagal dimuat. Periksa izin Firestore.");
-            });
+            for (const [name, target, label] of [
+                ['players', 'playersData', 'Data pemain'],
+                ['guilds', 'guildsData', 'Data tim'],
+                ['rewards', 'rewardsData', 'Data reward']
+            ]) {
+                onSnapshot(getColRef(name), (snap) => {
+                    window[target] = snap.docs.map(item => ({ ...item.data(), id: item.id }));
+                    loadErrors.delete(name);
+                    window.renderAll();
+                    settleLoad(name);
+                }, (err) => loadFailed(name, label, err));
+            }
 
-            onSnapshot(getColRef('guilds'), (snap) => {
-                window.guildsData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-                window.renderAll();
-            }, (err) => {
-                console.error("Firebase guilds error:", err);
-                finishLoading();
-                window.showMessage(
-                    "Database Error",
-                    "Data tim gagal dimuat. Kode: " + (err.code || "unknown") + ". Detail: " + (err.message || "Tidak ada detail") + ". Periksa Firebase Console > Firestore Database > Rules."
-                );
-            });
-
-            onSnapshot(getColRef('rewards'), (snap) => {
-                window.rewardsData = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-                window.renderAll();
-            }, (err) => {
-                console.error("Firebase rewards error:", err);
-                finishLoading();
-                window.showMessage("Database Error", "Data reward gagal dimuat. Periksa izin Firestore.");
-            });
-
-            onSnapshot(getDocRef('config', 'main'), async (docSnap) => {
+            onSnapshot(getDocRef('config', 'main'), (docSnap) => {
+                window.configReady = false;
+                window.validPins = [];
+                loadErrors.delete('config');
                 try {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
-                        if (data.siteContent) window.siteContent = data.siteContent;
-                        if (data.validPins) window.validPins = data.validPins;
+                        if (data.siteContent && typeof data.siteContent === 'object' && !Array.isArray(data.siteContent)) {
+                            const content = { ...window.siteContent };
+                            for (const key of Object.keys(content)) {
+                                if (typeof content[key] === 'string' && typeof data.siteContent[key] === 'string') {
+                                    content[key] = data.siteContent[key];
+                                }
+                            }
+                            if (Array.isArray(data.siteContent.stats)) {
+                                content.stats = data.siteContent.stats.filter(item => item &&
+                                    ['string', 'number'].includes(typeof item.val) && typeof item.lbl === 'string');
+                            }
+                            window.siteContent = content;
+                        }
+                        if (Array.isArray(data.validPins)) {
+                            window.validPins = data.validPins.filter(pin => typeof pin === 'string' && pin.length > 0);
+                        }
+                        window.configReady = true;
                     } else {
-                        await setDoc(getDocRef('config', 'main'), {
-                            siteContent: window.siteContent,
-                            validPins: window.validPins
-                        });
+                        // A visitor must not write configuration or seed a default admin PIN.
+                        loadErrors.set('config', 'Konfigurasi website belum tersedia. Tampilan bawaan digunakan; login admin dinonaktifkan.');
                     }
                     window.renderAll();
                 } catch (err) {
-                    console.error("Firebase config processing error:", err);
-                    window.showMessage("Database Error", "Konfigurasi website gagal diproses. Periksa izin baca/tulis Firestore.");
+                    loadFailed('config', 'Konfigurasi website', err);
                 } finally {
-                    finishLoading();
+                    settleLoad('config');
                 }
             }, (err) => {
-                console.error("Firebase config error:", err);
-                finishLoading();
-                window.showMessage("Database Error", "Konfigurasi gagal dimuat. Periksa koneksi Firebase dan Firestore Rules.");
+                window.configReady = false;
+                window.validPins = [];
+                loadFailed('config', 'Konfigurasi website (tampilan bawaan digunakan; login admin dinonaktifkan)', err);
             });
         }).catch(err => {
-            console.error("Firebase authentication error:", err);
+            console.error('Firebase authentication error:', err);
+            loadErrors.set('auth', 'Login Firebase gagal (' + (err.code || 'unknown') + '). Pengelola perlu memeriksa Anonymous Authentication di Firebase.');
+            updateLoadStatus();
             finishLoading();
-            window.showMessage("Database Error", "Login Firebase gagal. Pastikan Anonymous Authentication aktif pada Firebase.");
         });
 
         const canvas = document.getElementById('webgl-bg');
