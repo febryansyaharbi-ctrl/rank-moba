@@ -1500,7 +1500,10 @@
             }, (err) => {
                 console.error("Firebase guilds error:", err);
                 finishLoading();
-                window.showMessage("Database Error", "Data tim gagal dimuat. Periksa izin Firestore.");
+                window.showMessage(
+                    "Database Error",
+                    "Data tim gagal dimuat. Kode: " + (err.code || "unknown") + ". Detail: " + (err.message || "Tidak ada detail") + ". Periksa Firebase Console > Firestore Database > Rules."
+                );
             });
 
             onSnapshot(getColRef('rewards'), (snap) => {
