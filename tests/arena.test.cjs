@@ -1,0 +1,4 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const {progress,esc,safeImage}=require('../arena.js');
+test('rank boundaries match existing game',()=>{for(const[p,name]of[[0,'PAYAH'],[5,'PAYAH'],[6,'EPIC'],[10,'EPIC'],[11,'LEGEND'],[14,'LEGEND'],[15,'MYTHIC'],[19,'MYTHIC'],[20,'HONOR'],[24,'HONOR'],[25,'GLORY'],[29,'GLORY'],[30,'IMMORTAL'],[99,'IMMORTAL']])assert.equal(progress(p).rank.name,name);});
+test('progress uses actual next rank threshold',()=>{const p=progress(18);assert.equal(p.next.name,'HONOR');assert.equal(p.remaining,2);assert.equal(p.percent,60);assert.equal(progress(30).percent,100);assert.equal(progress(30).remaining,0);});
+test('untrusted labels and image schemes are escaped',()=>{assert.equal(esc('<img>'),'&lt;img&gt;');assert.equal(safeImage('javascript:alert(1)'), '');assert.equal(safeImage('https://example.com/a.png'),'https://example.com/a.png');});

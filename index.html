@@ -127,6 +127,7 @@
 
     </style>
     <link rel="stylesheet" href="./monitoring.css">
+    <link rel="stylesheet" href="./arena.css">
 </head>
 <body class="antialiased flex flex-col h-screen overflow-hidden">
     
@@ -163,7 +164,8 @@
             if(tabId === 'map') {
                 setTimeout(() => {
                     const mapContainer = document.getElementById('map-container');
-                    if(mapContainer) mapContainer.scrollTo({ top: mapContainer.scrollHeight, behavior: 'smooth' });
+                    if (typeof window.focusJourney === 'function') window.focusJourney();
+                    else if(mapContainer) mapContainer.scrollTo({ top: mapContainer.scrollHeight, behavior: 'smooth' });
                 }, 100);
             }
             if(typeof window.renderAll === 'function') {
@@ -554,6 +556,7 @@
     </div>
 
     <script src="./monitoring.js"></script>
+    <script src="./arena.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
@@ -1485,6 +1488,9 @@
                 }
             }, 500);
         };
+
+        window.installArenaVisuals();
+        window.renderHome();
 
         const loadingScreen = document.getElementById('loading-screen');
         loadingScreen.classList.remove('hidden');
