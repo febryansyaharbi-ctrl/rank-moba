@@ -17,3 +17,7 @@ A Chromium smoke test with fixture data verified Home actions, 31 Journey milest
 ## Backup
 
 Before this change, all repository code was preserved in branch `backup/before-home-journey-2026-10-13`, pointing to commit `0b97cfa0a37f18a4000b6adc0a44fcd9eacfb0ba`, including Monitoring. This is a code backup, not an export of Firestore records. Revert the visual-refresh commit for a focused rollback without discarding later changes.
+
+## Compact layout correction
+
+Removed duplicate top spacing below the global navigation (Home: 24px desktop / 18px mobile; Journey: 0). Journey keeps a compact title/rank toolbar; description and search are in a native details popover that overlays rather than shrinks the map. Selecting a player or locating the position closes the popover. Browser geometry checks with fixtures confirm a desktop toolbar below 100px, a map occupying over 75% of its desktop section and over 65% on mobile with player progress visible. Backup: `backup/before-compact-layout-2026-10-15`.
